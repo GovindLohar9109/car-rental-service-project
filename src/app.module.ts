@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
-import HealthController from './health/health.controller';
 import dotenv from 'dotenv';
+import { HealthModule } from './health/health.module';
 dotenv.config();
 
 @Module({
   imports: [
+    HealthModule,
     TypeOrmModule.forRoot({
       type: process.env.DB_TYPE,
       host: process.env.DB_HOST,
@@ -19,7 +20,7 @@ dotenv.config();
       // if it is true then typeorm will talk to db schema if tables not present will create , update , add column ,drop ect
     } as TypeOrmModuleOptions),
   ],
-  controllers: [HealthController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}

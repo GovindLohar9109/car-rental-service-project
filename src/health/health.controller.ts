@@ -1,12 +1,26 @@
-import { Controller, Get } from '@nestjs/common';
+// health.controller.ts
+import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 
-@Controller('health/api')
-export default class HealthController {
+@Controller('health')
+export class HealthController {
+  constructor(private readonly dataSource: DataSource) {}
+
   @Get()
-  checkHealth() {
-    return {
-      message: 'Ok',
-      serverTime: new Date().toISOString(),
-    };
+  async checkHealth() {
+    try {
+      await this.dataSource.query('SELECT 1');
+
+      return {
+        status: 'ok',
+        database: 'postgres',
+        serverTime: new Date().toISOString(),
+      };
+    } catch (error) {
+      throw new ServiceUnavailableException({
+        status: 'error',
+        database: 'postgres',
+      });
+    }
   }
 }
