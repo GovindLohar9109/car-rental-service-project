@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { Country } from 'src/countries/entities/country.entities';
+import { Country } from 'src/countries/entities/country.entity';
 import { State } from 'src/states/entities/state.entity';
 import { City } from 'src/cities/entities/city.entity';
 @Entity('addresses')
