@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
-import { Car } from 'src/cars/entities/car.entity';
+import { User } from '../../users/entities/user.entity';
+import { Car } from '../../cars/entities/car.entity';
 import { BookingStatus } from '../enums/booking.enum';
 @Entity('booking_histories')
 export class BookingHistory {

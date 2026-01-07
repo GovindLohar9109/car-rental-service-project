@@ -9,9 +9,9 @@ import {
   JoinColumn,
   OneToOne,
 } from 'typeorm';
-import { User } from 'src/users/entities/user.entity';
+import { User } from '../../users/entities/user.entity';
 
-import { Booking } from 'src/bookings/entities/booking.entity';
+import { Booking } from '../../bookings/entities/booking.entity';
 
 @Entity('feedbacks')
 export class Feedback {

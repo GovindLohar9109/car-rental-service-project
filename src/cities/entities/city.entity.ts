@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { State } from 'src/states/entities/state.entity';
+import { State } from '../../states/entities/state.entity';
 @Entity('cities')
 export class City {
   @PrimaryGeneratedColumn()

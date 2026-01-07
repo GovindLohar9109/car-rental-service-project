@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Country } from 'src/countries/entities/country.entities';
+import { Country } from '../../countries/entities/country.entity';
 @Entity('states')
 export class State {
   @PrimaryGeneratedColumn()
