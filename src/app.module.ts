@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 import { HealthModule } from './health/health.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { FeedbacksModule } from './feedbacks/feedbacks.module';
 dotenv.config();
 
 @Module({
@@ -19,6 +21,8 @@ dotenv.config();
       synchronize: false,
       // if it is true then typeorm will talk to db schema if tables not present will create , update , add column ,drop ect
     } as TypeOrmModuleOptions),
+    BookingsModule,
+    FeedbacksModule,
   ],
   controllers: [],
   providers: [],
