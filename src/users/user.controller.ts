@@ -11,26 +11,18 @@ import {
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/user-response.dto';
+
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {} // here is DI
 
   @Get('me')
   @HttpCode(200)
-  async getUser(@Req() req: any) {
-    const userId = req.user.userId;
-
-    const result = await this.userService.getUser(+userId);
-
-    return {
-      status: result.status,
-      data: plainToInstance(UserResponseDto, result.data, {
-        excludeExtraneousValues: true,
-      }),
-    };
+  async getUser(@Req() req: Response) {
+    const userId = 1;
+    return await this.userService.getUser(+userId);
   }
 
   @Get()
@@ -43,7 +35,7 @@ export class UserController {
   @Patch(':userId')
   @HttpCode(200)
   async updateUser(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.id;
+    const userId = 1;
     return this.userService.updateUser(userId, updateUserDto);
   }
 

@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 import { HealthModule } from './health/health.module';
 import { UserModule } from './users/user.module';
-import { AuthModule } from './auth/auth.module';
 
 dotenv.config();
 
@@ -22,7 +21,6 @@ dotenv.config();
     }),
     HealthModule,
     UserModule,
-    AuthModule,
   ],
   controllers: [],
   providers: [],
