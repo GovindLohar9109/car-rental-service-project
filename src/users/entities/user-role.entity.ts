@@ -5,24 +5,26 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   JoinColumn,
-  ManyToMany,
+  ManyToOne,
+  Index,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Role } from '../../roles/entities/role.entity';
 
 @Entity('user_role')
+@Index(['user', 'role', 'deletedAt'])
 export class UserRole {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => User, {
+  @ManyToOne(() => User, (user) => user.userRoles, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToMany(() => Role, {
+  @ManyToOne(() => Role, (role) => role.userRoles, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

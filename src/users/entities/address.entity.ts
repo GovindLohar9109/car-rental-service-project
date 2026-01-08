@@ -7,11 +7,13 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Index,
 } from 'typeorm';
 import { Country } from '../../countries/entities/country.entity';
 import { State } from '../../states/entities/state.entity';
 import { City } from '../../cities/entities/city.entity';
 @Entity('addresses')
+@Index(['country', 'state', 'city', 'deletedAt'])
 export class Address {
   @PrimaryGeneratedColumn()
   id: number;

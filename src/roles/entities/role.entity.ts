@@ -1,3 +1,4 @@
+import { UserRole } from '../../users/entities/user-role.entity';
 import {
   Entity,
   Column,
@@ -5,8 +6,11 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
+  Index,
 } from 'typeorm';
 @Entity('roles')
+@Index(['name', 'deletedAt'])
 export class Role {
   @PrimaryGeneratedColumn()
   id: number;
@@ -37,4 +41,7 @@ export class Role {
     default: null,
   })
   deletedAt: Date;
+
+  @OneToMany(() => UserRole, (userRole) => userRole.role)
+  userRoles: UserRole[];
 }

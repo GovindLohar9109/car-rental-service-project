@@ -8,12 +8,14 @@ import {
   ManyToOne,
   JoinColumn,
   OneToOne,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 
 import { Booking } from '../../bookings/entities/booking.entity';
 
 @Entity('feedbacks')
+@Index(['user', 'deletedAt'])
 export class Feedback {
   @PrimaryGeneratedColumn()
   id: number;

@@ -7,9 +7,11 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { Country } from '../../countries/entities/country.entity';
 @Entity('states')
+@Index(['country_id', 'name', 'deleted_at'])
 export class State {
   @PrimaryGeneratedColumn()
   id: number;

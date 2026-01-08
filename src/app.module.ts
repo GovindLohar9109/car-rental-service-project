@@ -2,13 +2,13 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 import { HealthModule } from './health/health.module';
-import { dataSourceOptions } from './db/data-source';
+import { UserModule } from './users/user.module';
+import { AuthModule } from './auth/auth.module';
 
 dotenv.config();
 
 @Module({
   imports: [
-    HealthModule,
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -18,8 +18,11 @@ dotenv.config();
       database: process.env.DB_NAME,
       synchronize: false,
       autoLoadEntities: true, // take entity from typeOrmModule.forFeature([]) and load here
-      migrations: ['src/migrations/*.ts'],
+      migrations: [],
     }),
+    HealthModule,
+    UserModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

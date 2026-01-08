@@ -5,6 +5,9 @@ export function generateHashPassword(password: string): string {
   return bcrypt.hashSync(password, salt);
 }
 
-export function comparePassword(hashPassword: string, password: string) {
+export function comparePassword(
+  password: string,
+  hashPassword: string,
+): boolean {
   return bcrypt.compare(password, hashPassword);
 }
