@@ -8,12 +8,13 @@ import {
   Get,
   Query,
   Req,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { plainToInstance } from 'class-transformer';
-import { UserResponseDto } from './dto/user-response.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {} // here is DI
@@ -21,35 +22,45 @@ export class UserController {
   @Get('me')
   @HttpCode(200)
   async getUser(@Req() req: any) {
-    const userId = req.user.userId;
-
-    const result = await this.userService.getUser(+userId);
-
-    return {
-      status: result.status,
-      data: plainToInstance(UserResponseDto, result.data, {
-        excludeExtraneousValues: true,
-      }),
-    };
+    try {
+      const userId = req.user.userId;
+      return await this.userService.getUser(+userId);
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @Get()
   @HttpCode(200)
   async getAllUsers(@Query() query: PaginationDto) {
-    const result = await this.userService.getAllUsers(query);
-    return result;
+    try {
+      const result = await this.userService.getAllUsers(query);
+      return result;
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Patch(':userId')
+  @Patch()
   @HttpCode(200)
   async updateUser(@Req() req: any, @Body() updateUserDto: UpdateUserDto) {
-    const userId = req.user.id;
-    return this.userService.updateUser(userId, updateUserDto);
+    try {
+      const userId = req.user.userId;
+      return this.userService.updateUser(userId, updateUserDto);
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 
-  @Delete(':userId')
-  @HttpCode(204) //no content
-  async removeUser(@Param('userId') userId: string) {
-    return await this.userService.removeUser(+userId);
+  @Delete()
+  @HttpCode(200)
+  async removeUser(@Req() req: any) {
+    try {
+      const userId = req.user.userId;
+      await this.userService.removeUser(+userId);
+      return { status: true, message: 'User deleted...' };
+    } catch (err) {
+      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

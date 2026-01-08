@@ -78,7 +78,10 @@ export class AuthService {
       });
 
       if (userData && userRole) {
-        const isPasswordMatch = comparePassword(password, userData.password);
+        const isPasswordMatch: boolean = await comparePassword(
+          password,
+          userData.password,
+        );
 
         if (!isPasswordMatch)
           throw new HttpException(

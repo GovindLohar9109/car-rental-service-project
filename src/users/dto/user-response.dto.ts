@@ -1,4 +1,4 @@
-import { Expose } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
 export class UserResponseDto {
   @Expose()
@@ -12,10 +12,4 @@ export class UserResponseDto {
 
   @Expose()
   phone: string;
-
-  @Expose()
-  createdAt: Date;
-
-  @Expose()
-  updatedAt: Date;
 }

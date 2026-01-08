@@ -5,6 +5,10 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatus } from '@nestjs/common';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { plainToInstance } from 'class-transformer';
+import { JwtHelper } from 'src/auth/helpers/jwt.helper';
+import { generateHashPassword } from 'src/auth/helpers/hashing.helper';
 
 @Injectable()
 export class UserService {
@@ -35,12 +39,25 @@ export class UserService {
         .take(limit)
         .getManyAndCount();
 
+      // doing serialization
+      const data = users.map((user) => {
+        const role = user.userRoles?.[0]?.role;
+
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          roleName: role?.name,
+        };
+      });
+
       // in which find() always use left join to perfome other joins we need to use QueryBuilder
       // typeorm automatically do join
       const totalPages = Math.ceil(totalRecords / limit);
       return {
         status: true,
-        data: users,
+        data,
         pagination: { page, limit, totalPages },
       };
     } catch (error) {
@@ -67,9 +84,14 @@ export class UserService {
         },
       });
 
+      // serilizing data here
+      const data = plainToInstance(UserResponseDto, userData, {
+        excludeExtraneousValues: true,
+      });
+
       return {
         status: true,
-        data: userData,
+        data,
       };
     } catch (error) {
       throw new HttpException(
@@ -89,6 +111,9 @@ export class UserService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      if (updateUserDto?.password) {
+        updateUserDto.password = generateHashPassword(updateUserDto.password);
+      }
       await this.userRepogistry.update({ id: userId }, { ...updateUserDto });
       return { status: true, message: 'User updated...' };
     } catch (error) {
@@ -101,7 +126,7 @@ export class UserService {
 
   async removeUser(userId: number) {
     try {
-      await this.userRepogistry.softDelete(userId);
+      return await this.userRepogistry.softDelete(userId);
     } catch (error) {
       throw new HttpException(
         error?.message || 'Internal Server Error',
