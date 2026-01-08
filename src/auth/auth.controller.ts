@@ -1,0 +1,71 @@
+import {
+  Controller,
+  Post,
+  Body,
+  HttpCode,
+  Res,
+  HttpException,
+  Req,
+  UnauthorizedException,
+} from '@nestjs/common';
+
+import type { Request } from 'express';
+
+import { AuthService } from './auth.service';
+
+import { JwtHelper } from './helpers/jwt.helper';
+import { RegisterAuthDto } from './dto/register.dto';
+import { LoginAuthDto } from './dto/login.dto';
+import { RegisterResponseDto } from './dto/registerResponse.dto';
+import { LoginResponseDto } from './dto/loginResponse.dto';
+import { RefreshResponseDto } from './dto/refreshResponse.dto';
+
+@Controller('auth')
+export class AuthController {
+  constructor(private readonly authService: AuthService) {} // here is DI
+
+  @Post('register')
+  @HttpCode(201)
+  async userRegister(
+    @Body() registerAuthDto: RegisterAuthDto,
+  ): Promise<RegisterResponseDto> {
+    return await this.authService.userRegister(registerAuthDto);
+  }
+  @Post('login')
+  @HttpCode(200)
+  async userLogin(
+    @Res({ passthrough: true }) res: Response,
+    @Body() loginAuthDto: LoginAuthDto,
+  ): Promise<LoginResponseDto> {
+    try {
+      const result = await this.authService.userLogin(loginAuthDto);
+      return result;
+    } catch (error) {
+      throw new HttpException(error?.message, error?.status);
+    }
+  }
+
+  @Post('refresh')
+  async refresh(@Req() req: Request): Promise<RefreshResponseDto> {
+    const authorization = req.headers.authorization;
+
+    if (!authorization || !authorization.startsWith('Bearer ')) {
+      throw new UnauthorizedException('Refresh token missing');
+    }
+
+    const refreshToken = authorization.split(' ')[1];
+
+    try {
+      const payload = await JwtHelper.verifyRefreshToken(refreshToken);
+
+      const newAccessToken = await JwtHelper.generateAccessToken({
+        userId: payload.userId as number,
+        roleName: payload.roleName as string,
+      });
+
+      return { accessToken: newAccessToken };
+    } catch {
+      throw new UnauthorizedException('Invalid refresh token');
+    }
+  }
+}

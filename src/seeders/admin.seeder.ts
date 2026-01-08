@@ -1,5 +1,5 @@
 import { UserRole } from '../users/entities/user-role.entity';
-import { generateHashPassword } from '../helpers/hashing.helper';
+import { generateHashPassword } from '../auth/helpers/hashing.helper';
 import { User } from '../users/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';

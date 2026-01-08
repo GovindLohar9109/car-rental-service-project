@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { HealthModule } from './health/health.module';
 import { UserModule } from './users/user.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
 
 dotenv.config();
 
@@ -19,6 +20,10 @@ dotenv.config();
       synchronize: false,
       autoLoadEntities: true, // take entity from typeOrmModule.forFeature([]) and load here
       migrations: [],
+    }),
+    JwtModule.register({
+      global: true,
+      secret: 'secretKey',
     }),
     HealthModule,
     UserModule,
