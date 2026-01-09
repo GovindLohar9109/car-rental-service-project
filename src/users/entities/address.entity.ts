@@ -12,6 +12,7 @@ import {
 import { Country } from '../../countries/entities/country.entity';
 import { State } from '../../states/entities/state.entity';
 import { City } from '../../cities/entities/city.entity';
+import { UserAddress } from './user-address.entity';
 @Entity('addresses')
 @Index(['country', 'state', 'city', 'deletedAt'])
 export class Address {

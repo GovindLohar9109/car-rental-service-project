@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Country } from '../../countries/entities/country.entity';
 @Entity('states')
-@Index(['country_id', 'name', 'deleted_at'])
+@Index(['country', 'name', 'deletedAt'])
 export class State {
   @PrimaryGeneratedColumn()
   id: number;

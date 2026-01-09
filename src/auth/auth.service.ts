@@ -6,7 +6,7 @@ import {
   comparePassword,
 } from './helpers/hashing.helper';
 import { HttpStatus } from '@nestjs/common';
-import { UserRole } from 'src/users/entities/user-role.entity';
+import { UserRole } from '../users/entities/user-role.entity';
 import { Role } from '../roles/entities/role.entity';
 import { JwtHelper } from '../auth/helpers/jwt.helper';
 import { User } from '../users/entities/user.entity';

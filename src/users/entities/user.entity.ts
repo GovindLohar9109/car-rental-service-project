@@ -9,6 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import { UserRole } from './user-role.entity';
+import { UserAddress } from './user-address.entity';
 
 @Entity('users')
 @Index(['name', 'deletedAt'])
@@ -53,4 +54,10 @@ export class User {
   deletedAt: Date;
   @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];
+
+  @OneToMany(() => UserAddress, (userAddress) => userAddress.user, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  userAddresses: UserAddress[];
 }

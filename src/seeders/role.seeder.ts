@@ -1,14 +1,15 @@
 import { DataSource } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
+import { UserRoleEnum } from '../common/dto/enums/user-role.enum';
 
 export default async function roleSeeder(dataSource: DataSource) {
   const roleRepo = dataSource.getRepository(Role);
 
-  const roleData: Partial<Role>[] = [
-    { name: 'Admin' },
-    { name: 'Car Owner' },
-    { name: 'User' },
+  const roleData = [
+    { name: UserRoleEnum.ADMIN },
+    { name: UserRoleEnum.CAR_OWNER },
+    { name: UserRoleEnum.USER },
   ];
 
-  await roleRepo.save(roleData);
+  await roleRepo.upsert(roleData, ['name']);
 }

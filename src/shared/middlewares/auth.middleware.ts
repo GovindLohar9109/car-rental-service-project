@@ -1,13 +1,11 @@
 import {
-  HttpException,
-  HttpStatus,
   Injectable,
   NestMiddleware,
   UnauthorizedException,
 } from '@nestjs/common';
 
 import { Request, Response, NextFunction } from 'express';
-import { JwtHelper } from 'src/auth/helpers/jwt.helper';
+import { JwtHelper } from '../../auth/helpers/jwt.helper';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

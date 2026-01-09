@@ -4,12 +4,10 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatus } from '@nestjs/common';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { plainToInstance } from 'class-transformer';
-import { JwtHelper } from 'src/auth/helpers/jwt.helper';
-import { generateHashPassword } from 'src/auth/helpers/hashing.helper';
-
+import { generateHashPassword } from '../auth/helpers/hashing.helper';
 @Injectable()
 export class UserService {
   constructor(
@@ -126,7 +124,8 @@ export class UserService {
 
   async removeUser(userId: number) {
     try {
-      return await this.userRepogistry.softDelete(userId);
+      await this.userRepogistry.softDelete(userId);
+      return { status: true, message: 'User deleted...' };
     } catch (error) {
       throw new HttpException(
         error?.message || 'Internal Server Error',

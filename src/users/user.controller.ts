@@ -2,7 +2,6 @@ import {
   Controller,
   Body,
   Patch,
-  Param,
   Delete,
   HttpCode,
   Get,
@@ -12,7 +11,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { UserService } from './user.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Controller('users')
@@ -57,8 +56,7 @@ export class UserController {
   async removeUser(@Req() req: any) {
     try {
       const userId = req.user.userId;
-      await this.userService.removeUser(+userId);
-      return { status: true, message: 'User deleted...' };
+      return await this.userService.removeUser(+userId);
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
