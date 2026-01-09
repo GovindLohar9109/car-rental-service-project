@@ -1,26 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCarDto } from './dto/create-car.dto';
-import { UpdateCarDto } from './dto/update-car.dto';
+import { HttpException, Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { HttpStatus } from '@nestjs/common';
+import { Car } from './entities/car.entity';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Injectable()
-export class CarsService {
-  create(createCarDto: CreateCarDto) {
-    return 'This action adds a new car';
-  }
+export class CarService {
+  constructor(
+    @InjectRepository(Car)
+    private readonly carRepository: Repository<Car>,
+  ) {}
 
-  findAll() {
-    return `This action returns all cars`;
-  }
+  async getAllCar(query: PaginationDto) {
+    const { page, limit } = query;
 
-  findOne(id: number) {
-    return `This action returns a #${id} car`;
-  }
+    try {
+      const skipRows = (page - 1) * limit;
 
-  update(id: number, updateCarDto: UpdateCarDto) {
-    return `This action updates a #${id} car`;
-  }
+      let [Cars, totalRecords] = await this.carRepository.findAndCount({
+        take: limit,
+        skip: skipRows,
+      });
 
-  remove(id: number) {
-    return `This action removes a #${id} car`;
+      const totalPages = Math.ceil(totalRecords / limit);
+      return {
+        status: true,
+        data: Cars,
+        pagination: { page, limit, totalPages },
+      };
+    } catch (error) {
+      throw new HttpException(
+        error?.message || 'Internal Server Error',
+        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -16,13 +16,15 @@ export default async function adminSeeder(dataSource: DataSource) {
     phone: process.env.ADMIN_PHONE,
     password: hashPassword,
   };
-  const userData = await userRepo.save(adminData);
+  const userData = await userRepo.save(userRepo.create(adminData));
   const roleData = await roleRepo.findOne({
     where: { name: 'Admin' },
     select: { id: true },
   });
-  await userRoleRepo.save({
-    user: { id: userData.id },
-    role: { id: roleData?.id },
-  });
+  await userRoleRepo.save(
+    userRoleRepo.create({
+      user: { id: userData.id },
+      role: { id: roleData?.id },
+    }),
+  );
 }

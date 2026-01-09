@@ -43,14 +43,15 @@ export class AuthService {
       if (!userData || !userRole) {
         const hashPassword = generateHashPassword(password);
         registerAuthDto.password = hashPassword;
+        const newUser = this.userRepogistry.create(registerAuthDto);
+        if (!userData) userData = await this.userRepogistry.save(newUser);
 
-        if (!userData)
-          userData = await this.userRepogistry.save(registerAuthDto);
-
-        await this.userRoleRepogistry.save({
-          user: { id: userData.id },
-          role: { id: roleId },
-        });
+        await this.userRoleRepogistry.save(
+          this.userRoleRepogistry.create({
+            user: { id: userData.id },
+            role: { id: roleId },
+          }),
+        );
 
         return { status: true, message: 'User Registered ....' };
       } else {

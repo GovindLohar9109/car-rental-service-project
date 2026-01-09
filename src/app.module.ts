@@ -12,6 +12,7 @@ import { UserModule } from './users/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthMiddleware } from './shared/middlewares/auth.middleware';
 import { AuthModule } from './auth/auth.module';
+import { CarModule } from './cars/car.module';
 
 dotenv.config();
 
@@ -35,6 +36,7 @@ dotenv.config();
     HealthModule,
     UserModule,
     AuthModule,
+    CarModule,
   ],
   controllers: [],
   providers: [],

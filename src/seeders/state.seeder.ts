@@ -18,6 +18,6 @@ export default async function stateSeeder(dataSource: DataSource) {
       country: { id: countryMap.get(location.country) },
     })),
   );
-  console.log(statesData);
-  await stateRepo.save(statesData);
+
+  await stateRepo.save(stateRepo.create(statesData));
 }

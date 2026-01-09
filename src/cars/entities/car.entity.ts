@@ -33,6 +33,9 @@ export class Car {
   @Column({ length: 20, nullable: false })
   type: string;
 
+  @Column({ nullable: false, type: 'text', name: 'image_url' })
+  imageUrl: string;
+
   @Column({ length: 50, nullable: false })
   model: string;
 

@@ -10,8 +10,7 @@ import { Address } from './entities/address.entity';
 import { City } from '../cities/entities/city.entity';
 import { Country } from '../countries/entities/country.entity';
 import { State } from '../states/entities/state.entity';
-import { UserAddressController } from './user-address.controller';
-import { UserAddressService } from './user-address.service';
+import { Car } from '../cars/entities/car.entity';
 
 @Module({
   imports: [
@@ -24,9 +23,10 @@ import { UserAddressService } from './user-address.service';
       City,
       Country,
       State,
+      Car,
     ]),
   ],
-  controllers: [UserController, UserAddressController],
-  providers: [UserService, UserAddressService],
+  controllers: [UserController],
+  providers: [UserService],
 })
 export class UserModule {}

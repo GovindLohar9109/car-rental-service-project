@@ -11,5 +11,5 @@ export default async function roleSeeder(dataSource: DataSource) {
     { name: UserRoleEnum.USER },
   ];
 
-  await roleRepo.upsert(roleData, ['name']);
+  await roleRepo.save(roleRepo.create(roleData));
 }
