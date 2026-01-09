@@ -24,7 +24,12 @@ export class Car {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'enum', nullable: false, enum: CarStatus })
+  @Column({
+    type: 'enum',
+    nullable: false,
+    enum: CarStatus,
+    default: CarStatus.AVAILABLE,
+  })
   status: CarStatus;
 
   @Column({ type: 'float', nullable: false })

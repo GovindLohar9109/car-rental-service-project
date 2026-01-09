@@ -4,20 +4,15 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
-  IsTimeZone,
   Max,
   MaxLength,
   Min,
 } from 'class-validator';
-import { CarStatus } from '../enums/car-status.enum';
+
 export class CreateCarDto {
   @IsNotEmpty()
   @IsNumber()
   readonly price: number;
-
-  @IsNotEmpty()
-  @MaxLength(254)
-  readonly status: CarStatus;
 
   @IsString()
   @IsNotEmpty()

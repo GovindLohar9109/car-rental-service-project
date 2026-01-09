@@ -322,7 +322,6 @@ export class UserService {
   async addCar(userId: number, createCarDto: CreateCarDto) {
     try {
       const carData: object = {
-        status: createCarDto.status,
         type: createCarDto.type,
         model: createCarDto.model,
         color: createCarDto.color,

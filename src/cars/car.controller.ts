@@ -1,14 +1,14 @@
 import {
   Controller,
-  Body,
   HttpCode,
   Get,
   HttpException,
   HttpStatus,
-  Param,
+  Query,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { CarFilterDto } from './dto/car-filter.dto';
 
 @Controller('cars')
 export class CarController {
@@ -16,9 +16,14 @@ export class CarController {
 
   @Get()
   @HttpCode(200)
-  async getAllCar(@Param() query: PaginationDto) {
+  async getAllCar(
+    @Query() query: PaginationDto,
+    @Query() carFilterDto: CarFilterDto,
+  ) {
     try {
-      return await this.carService.getAllCar(query);
+      const result = await this.carService.getAllCar(query, carFilterDto);
+      console.log(result);
+      return result;
     } catch (err) {
       throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
