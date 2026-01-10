@@ -6,11 +6,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class BookingHistory1767787824400 implements MigrationInterface {
+export class Car1767800000009 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'booking_histories',
+        name: 'cars',
         columns: [
           {
             name: 'id',
@@ -21,13 +21,20 @@ export class BookingHistory1767787824400 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'image_url',
+            type: 'text',
+            isNullable: false,
+          },
+          {
             name: 'user_id',
             type: 'int',
             isNullable: false,
           },
           {
-            name: 'car_id',
-            type: 'int',
+            name: 'status',
+            type: 'enum',
+            enumName: 'car_status_enum',
+            enum: ['AVAILABLE', 'BOOKED', 'IN_SERVICE'],
             isNullable: false,
           },
           {
@@ -36,19 +43,30 @@ export class BookingHistory1767787824400 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'status',
-            type: 'enum',
-            enumName: 'booking_status_enum',
-            enum: ['CONFIRMED', 'ONGOING', 'COMPLETE', 'EXPIRED'],
+            name: 'type',
+            type: 'varchar',
+            length: '20',
             isNullable: false,
           },
           {
-            name: 'start_date',
-            type: 'timestamptz',
+            name: 'model',
+            type: 'varchar',
+            length: '50',
             isNullable: false,
           },
           {
-            name: 'end_date',
+            name: 'color',
+            type: 'varchar',
+            length: '25',
+            isNullable: false,
+          },
+          {
+            name: 'total_seat',
+            type: 'int',
+            isNullable: false,
+          },
+          {
+            name: 'insurance_expiration_date',
             type: 'timestamptz',
             isNullable: false,
           },
@@ -74,7 +92,8 @@ export class BookingHistory1767787824400 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys('booking_histories', [
+    await queryRunner.createForeignKey(
+      'cars',
       new TableForeignKey({
         columnNames: ['user_id'],
         referencedTableName: 'users',
@@ -82,25 +101,18 @@ export class BookingHistory1767787824400 implements MigrationInterface {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       }),
-      new TableForeignKey({
-        columnNames: ['car_id'],
-        referencedTableName: 'cars',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-    ]);
+    );
 
     await queryRunner.createIndex(
-      'booking_histories',
+      'cars',
       new TableIndex({
-        name: 'booking_histories_user_car_status_cidx',
-        columnNames: ['user_id', 'car_id', 'status', 'deleted_at'],
+        name: 'cars_user_status_cidx',
+        columnNames: ['user_id', 'status', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('booking_histories');
+    await queryRunner.dropTable('cars');
   }
 }

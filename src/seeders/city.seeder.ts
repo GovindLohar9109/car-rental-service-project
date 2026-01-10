@@ -20,5 +20,5 @@ export default async function citySeeder(dataSource: DataSource) {
       });
     });
   });
-  await cityRepo.save(cityRepo.create(cityData));
+  await cityRepo.upsert(cityRepo.create(cityData), ['name', 'state']);
 }

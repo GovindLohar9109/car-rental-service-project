@@ -1,16 +1,10 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableForeignKey,
-  TableIndex,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class UserAddress1767781791531 implements MigrationInterface {
+export class User1767800000001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'user_address',
+        name: 'users',
         columns: [
           {
             name: 'id',
@@ -21,19 +15,25 @@ export class UserAddress1767781791531 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'user_id',
-            type: 'int',
+            name: 'name',
+            type: 'varchar(30)',
             isNullable: false,
           },
           {
-            name: 'address_id',
-            type: 'int',
+            name: 'email',
+            type: 'varchar(254)',
             isNullable: false,
+            isUnique: true,
           },
           {
-            name: 'tag',
-            type: 'varchar',
-            length: '15',
+            name: 'phone',
+            type: 'varchar(20)',
+            isNullable: false,
+          },
+
+          {
+            name: 'password',
+            type: 'varchar(255)',
             isNullable: false,
           },
           {
@@ -58,33 +58,24 @@ export class UserAddress1767781791531 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys('user_address', [
-      new TableForeignKey({
-        columnNames: ['user_id'],
-        referencedTableName: 'users',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-      new TableForeignKey({
-        columnNames: ['address_id'],
-        referencedTableName: 'addresses',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-    ]);
-
     await queryRunner.createIndex(
-      'user_address',
+      'users',
       new TableIndex({
-        name: 'user_address_user_address_cidx',
-        columnNames: ['user_id', 'address_id', 'deleted_at'],
+        name: 'users_name_cidx',
+        columnNames: ['name', 'deleted_at'],
+      }),
+    );
+    await queryRunner.createIndex(
+      'users',
+      new TableIndex({
+        name: 'users_email_deleted_at_cuidx',
+        columnNames: ['email', 'deleted_at'],
+        isUnique: true,
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('user_address');
+    await queryRunner.dropTable('users');
   }
 }

@@ -1,10 +1,16 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+  TableIndex,
+} from 'typeorm';
 
-export class User1767778197755 implements MigrationInterface {
+export class Feedback1767800000012 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'users',
+        name: 'feedbacks',
         columns: [
           {
             name: 'id',
@@ -15,24 +21,19 @@ export class User1767778197755 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'name',
-            type: 'varchar(30)',
+            name: 'booking_id',
+            type: 'int',
             isNullable: false,
           },
           {
-            name: 'email',
-            type: 'varchar(254)',
-            isNullable: false,
-            isUnique: true,
-          },
-          {
-            name: 'phone',
-            type: 'varchar(20)',
+            name: 'user_id',
+            type: 'int',
             isNullable: false,
           },
           {
-            name: 'password',
-            type: 'varchar(255)',
+            name: 'description',
+            type: 'varchar',
+            length: '255',
             isNullable: false,
           },
           {
@@ -57,16 +58,33 @@ export class User1767778197755 implements MigrationInterface {
       }),
     );
 
+    await queryRunner.createForeignKeys('feedbacks', [
+      new TableForeignKey({
+        columnNames: ['booking_id'],
+        referencedTableName: 'bookings',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+      new TableForeignKey({
+        columnNames: ['user_id'],
+        referencedTableName: 'users',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+    ]);
+
     await queryRunner.createIndex(
-      'users',
+      'feedbacks',
       new TableIndex({
-        name: 'users_name_cidx',
-        columnNames: ['name', 'deleted_at'],
+        name: 'feedbacks_user_deleted_cidx',
+        columnNames: ['user_id', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('users');
+    await queryRunner.dropTable('feedbacks');
   }
 }

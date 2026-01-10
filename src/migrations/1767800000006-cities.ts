@@ -1,10 +1,16 @@
-import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+  TableIndex,
+} from 'typeorm';
 
-export class Role1767781809255 implements MigrationInterface {
+export class City1767800000006 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'roles',
+        name: 'cities',
         columns: [
           {
             name: 'id',
@@ -17,9 +23,13 @@ export class Role1767781809255 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
-            length: '30',
+            length: '40',
             isNullable: false,
-            isUnique: true,
+          },
+          {
+            name: 'state_id',
+            type: 'int',
+            isNullable: false,
           },
           {
             name: 'created_at',
@@ -43,16 +53,27 @@ export class Role1767781809255 implements MigrationInterface {
       }),
     );
 
+    await queryRunner.createForeignKey(
+      'cities',
+      new TableForeignKey({
+        columnNames: ['state_id'],
+        referencedTableName: 'states',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+    );
+
     await queryRunner.createIndex(
-      'roles',
+      'cities',
       new TableIndex({
-        name: 'roles_name_deleted_cidx',
-        columnNames: ['name', 'deleted_at'],
+        name: 'cities_state_name_cidx',
+        columnNames: ['state_id', 'name', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('roles');
+    await queryRunner.dropTable('cities');
   }
 }

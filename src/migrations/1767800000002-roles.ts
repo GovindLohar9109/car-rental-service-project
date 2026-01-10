@@ -1,15 +1,10 @@
-import {
-  MigrationInterface,
-  QueryRunner,
-  Table,
-  TableForeignKey,
-} from 'typeorm';
+import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class State1767782602283 implements MigrationInterface {
+export class Role1767800000002 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'states',
+        name: 'roles',
         columns: [
           {
             name: 'id',
@@ -21,45 +16,43 @@ export class State1767782602283 implements MigrationInterface {
           },
           {
             name: 'name',
-            type: 'varchar(40)',
+            type: 'varchar',
+            length: '30',
             isNullable: false,
-          },
-          {
-            name: 'country_id',
-            type: 'int',
+            isUnique: true,
           },
           {
             name: 'created_at',
             type: 'timestamptz',
             isNullable: false,
+            default: 'CURRENT_TIMESTAMP',
           },
           {
-            type: 'timestamptz',
             name: 'updated_at',
+            type: 'timestamptz',
             isNullable: false,
+            default: 'CURRENT_TIMESTAMP',
           },
           {
-            type: 'timestamptz',
             name: 'deleted_at',
+            type: 'timestamptz',
             isNullable: true,
             default: null,
           },
         ],
       }),
     );
-    await queryRunner.createForeignKey(
-      'states',
-      new TableForeignKey({
-        columnNames: ['country_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'countries',
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
+
+    await queryRunner.createIndex(
+      'roles',
+      new TableIndex({
+        name: 'roles_name_deleted_cidx',
+        columnNames: ['name', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('states');
+    await queryRunner.dropTable('roles');
   }
 }

@@ -6,11 +6,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class Addresse1767780277205 implements MigrationInterface {
+export class UserAddress1767800000008 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'addresses',
+        name: 'user_address',
         columns: [
           {
             name: 'id',
@@ -21,28 +21,17 @@ export class Addresse1767780277205 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'address_line',
-            type: 'varchar',
-            length: '100',
-            isNullable: false,
-          },
-          {
-            name: 'country_id',
+            name: 'user_id',
             type: 'int',
             isNullable: false,
           },
           {
-            name: 'state_id',
+            name: 'address_id',
             type: 'int',
             isNullable: false,
           },
           {
-            name: 'city_id',
-            type: 'int',
-            isNullable: false,
-          },
-          {
-            name: 'zip',
+            name: 'tag',
             type: 'varchar',
             length: '15',
             isNullable: false,
@@ -69,24 +58,17 @@ export class Addresse1767780277205 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys('addresses', [
+    await queryRunner.createForeignKeys('user_address', [
       new TableForeignKey({
-        columnNames: ['country_id'],
-        referencedTableName: 'countries',
+        columnNames: ['user_id'],
+        referencedTableName: 'users',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['state_id'],
-        referencedTableName: 'states',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-      new TableForeignKey({
-        columnNames: ['city_id'],
-        referencedTableName: 'cities',
+        columnNames: ['address_id'],
+        referencedTableName: 'addresses',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -94,15 +76,15 @@ export class Addresse1767780277205 implements MigrationInterface {
     ]);
 
     await queryRunner.createIndex(
-      'addresses',
+      'user_address',
       new TableIndex({
-        name: 'addresses_location_cidx',
-        columnNames: ['country_id', 'state_id', 'city_id', 'deleted_at'],
+        name: 'user_address_user_address_cidx',
+        columnNames: ['user_id', 'address_id', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('addresses');
+    await queryRunner.dropTable('user_address');
   }
 }

@@ -14,7 +14,7 @@ import { Address } from './entities/address.entity';
 import { UserAddress } from './entities/user-address.entity';
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
 import { Car } from '../cars/entities/car.entity';
-import { CreateCarDto } from 'src/cars/dto/create-car.dto';
+import { CreateCarDto } from '../cars/dto/create-car.dto';
 
 @Injectable()
 export class UserService {
@@ -371,17 +371,6 @@ export class UserService {
       );
     }
   }
-  async updateCar(carId: number, updateCarDto: UpdateCarDto) {
-    try {
-      await this.carRepository.update({ id: carId }, { ...updateCarDto });
-      return { status: true, message: 'Car  updated...' };
-    } catch (error) {
-      throw new HttpException(
-        error?.message || 'Internal Server Error',
-        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
   async getCarDetails(carId: number) {
     try {
       const car = await this.carRepository.findOne({
@@ -399,6 +388,18 @@ export class UserService {
       );
     }
   }
+  async updateCar(carId: number, updateCarDto: UpdateCarDto) {
+    try {
+      await this.carRepository.update({ id: carId }, { ...updateCarDto });
+      return { status: true, message: 'Car  updated...' };
+    } catch (error) {
+      throw new HttpException(
+        error?.message || 'Internal Server Error',
+        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async removeCar(carId: number) {
     try {
       await this.carRepository.softDelete(carId);

@@ -6,11 +6,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class City1767781727805 implements MigrationInterface {
+export class UserRole1767800000003 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'cities',
+        name: 'user_role',
         columns: [
           {
             name: 'id',
@@ -21,13 +21,12 @@ export class City1767781727805 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'name',
-            type: 'varchar',
-            length: '40',
+            name: 'user_id',
+            type: 'int',
             isNullable: false,
           },
           {
-            name: 'state_id',
+            name: 'role_id',
             type: 'int',
             isNullable: false,
           },
@@ -53,27 +52,33 @@ export class City1767781727805 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKey(
-      'cities',
+    await queryRunner.createForeignKeys('user_role', [
       new TableForeignKey({
-        columnNames: ['state_id'],
-        referencedTableName: 'states',
+        columnNames: ['user_id'],
+        referencedTableName: 'users',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       }),
-    );
+      new TableForeignKey({
+        columnNames: ['role_id'],
+        referencedTableName: 'roles',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+    ]);
 
     await queryRunner.createIndex(
-      'cities',
+      'user_role',
       new TableIndex({
-        name: 'cities_state_name_cidx',
-        columnNames: ['state_id', 'name', 'deleted_at'],
+        name: 'user_role_user_role_cidx',
+        columnNames: ['user_id', 'role_id', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('cities');
+    await queryRunner.dropTable('user_role');
   }
 }

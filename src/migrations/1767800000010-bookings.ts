@@ -6,7 +6,7 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class Booking1767781850046 implements MigrationInterface {
+export class Booking1767800000010 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
@@ -31,7 +31,7 @@ export class Booking1767781850046 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'price',
+            name: 'total_amount',
             type: 'float',
             isNullable: false,
           },

@@ -11,6 +11,8 @@ import {
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { CarStatus } from '../enums/car-status.enum';
+import { Exclude, Expose } from 'class-transformer';
+@Expose()
 @Entity('cars')
 @Index(['user', 'deletedAt'])
 export class Car {
@@ -57,6 +59,7 @@ export class Car {
   })
   insuranceExpirationDate: Date;
 
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamptz',
     name: 'created_at',
@@ -65,6 +68,7 @@ export class Car {
   })
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn({
     type: 'timestamptz',
     name: 'updated_at',
@@ -73,6 +77,7 @@ export class Car {
   })
   updatedAt: Date;
 
+  @Exclude()
   @DeleteDateColumn({
     type: 'timestamptz',
     name: 'deleted_at',

@@ -6,11 +6,11 @@ import {
   TableIndex,
 } from 'typeorm';
 
-export class UserRole1767781778543 implements MigrationInterface {
+export class Addresse1767800000007 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'user_role',
+        name: 'addresses',
         columns: [
           {
             name: 'id',
@@ -21,13 +21,30 @@ export class UserRole1767781778543 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'user_id',
+            name: 'address_line',
+            type: 'varchar',
+            length: '100',
+            isNullable: false,
+          },
+          {
+            name: 'country_id',
             type: 'int',
             isNullable: false,
           },
           {
-            name: 'role_id',
+            name: 'state_id',
             type: 'int',
+            isNullable: false,
+          },
+          {
+            name: 'city_id',
+            type: 'int',
+            isNullable: false,
+          },
+          {
+            name: 'zip',
+            type: 'varchar',
+            length: '15',
             isNullable: false,
           },
           {
@@ -52,17 +69,24 @@ export class UserRole1767781778543 implements MigrationInterface {
       }),
     );
 
-    await queryRunner.createForeignKeys('user_role', [
+    await queryRunner.createForeignKeys('addresses', [
       new TableForeignKey({
-        columnNames: ['user_id'],
-        referencedTableName: 'users',
+        columnNames: ['country_id'],
+        referencedTableName: 'countries',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       }),
       new TableForeignKey({
-        columnNames: ['role_id'],
-        referencedTableName: 'roles',
+        columnNames: ['state_id'],
+        referencedTableName: 'states',
+        referencedColumnNames: ['id'],
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
+      }),
+      new TableForeignKey({
+        columnNames: ['city_id'],
+        referencedTableName: 'cities',
         referencedColumnNames: ['id'],
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
@@ -70,15 +94,15 @@ export class UserRole1767781778543 implements MigrationInterface {
     ]);
 
     await queryRunner.createIndex(
-      'user_role',
+      'addresses',
       new TableIndex({
-        name: 'user_role_user_role_cidx',
-        columnNames: ['user_id', 'role_id', 'deleted_at'],
+        name: 'addresses_location_cidx',
+        columnNames: ['country_id', 'state_id', 'city_id', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('user_role');
+    await queryRunner.dropTable('addresses');
   }
 }

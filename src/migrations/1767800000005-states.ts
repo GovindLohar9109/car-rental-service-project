@@ -3,14 +3,13 @@ import {
   QueryRunner,
   Table,
   TableForeignKey,
-  TableIndex,
 } from 'typeorm';
 
-export class Feedback1767781885724 implements MigrationInterface {
+export class State1767800000005 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'feedbacks',
+        name: 'states',
         columns: [
           {
             name: 'id',
@@ -21,70 +20,47 @@ export class Feedback1767781885724 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'booking_id',
-            type: 'int',
+            name: 'name',
+            isUnique: true,
+            type: 'varchar(40)',
             isNullable: false,
           },
           {
-            name: 'user_id',
+            name: 'country_id',
             type: 'int',
-            isNullable: false,
-          },
-          {
-            name: 'description',
-            type: 'varchar',
-            length: '255',
-            isNullable: false,
           },
           {
             name: 'created_at',
             type: 'timestamptz',
             isNullable: false,
-            default: 'CURRENT_TIMESTAMP',
           },
           {
+            type: 'timestamptz',
             name: 'updated_at',
-            type: 'timestamptz',
             isNullable: false,
-            default: 'CURRENT_TIMESTAMP',
           },
           {
-            name: 'deleted_at',
             type: 'timestamptz',
+            name: 'deleted_at',
             isNullable: true,
             default: null,
           },
         ],
       }),
     );
-
-    await queryRunner.createForeignKeys('feedbacks', [
+    await queryRunner.createForeignKey(
+      'states',
       new TableForeignKey({
-        columnNames: ['booking_id'],
-        referencedTableName: 'bookings',
+        columnNames: ['country_id'],
         referencedColumnNames: ['id'],
+        referencedTableName: 'countries',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
-      }),
-      new TableForeignKey({
-        columnNames: ['user_id'],
-        referencedTableName: 'users',
-        referencedColumnNames: ['id'],
-        onDelete: 'CASCADE',
-        onUpdate: 'CASCADE',
-      }),
-    ]);
-
-    await queryRunner.createIndex(
-      'feedbacks',
-      new TableIndex({
-        name: 'feedbacks_user_deleted_cidx',
-        columnNames: ['user_id', 'deleted_at'],
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('feedbacks');
+    await queryRunner.dropTable('states');
   }
 }
