@@ -7,13 +7,23 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  OneToOne,
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { CarStatus } from '../enums/car-status.enum';
-@Entity('cars')
-export class Car {
+
+import { Booking } from 'src/bookings/entities/booking.entity';
+
+@Entity('feedbacks')
+export class Feedback {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @OneToOne(() => Booking, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'booking_id' })
+  booking: Booking;
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
@@ -22,30 +32,13 @@ export class Car {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'enum', nullable: false, enum: CarStatus })
-  status: CarStatus;
-
-  @Column({ type: 'float', nullable: false })
-  price: number;
-
-  @Column({ length: 20, nullable: false })
-  type: string;
-
-  @Column({ length: 50, nullable: false })
-  model: string;
-
-  @Column({ length: 25, nullable: false })
-  color: string;
-
-  @Column({ name: 'total_seat', nullable: false })
-  totalSeat: number;
-
   @Column({
-    name: 'insurance_expiration_date',
+    type: 'varchar',
+    length: 255,
+    name: 'description',
     nullable: false,
-    type: 'timestamptz',
   })
-  insuranceExpirationDate: Date;
+  description: string;
 
   @CreateDateColumn({
     type: 'timestamptz',

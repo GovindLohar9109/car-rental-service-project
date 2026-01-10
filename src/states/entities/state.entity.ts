@@ -1,30 +1,28 @@
 import {
   Entity,
   Column,
-  Index,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
-
-@Entity('users')
-@Index(['name', 'deletedAt'])
-export class User {
+import { Country } from '../../countries/entities/country.entities';
+@Entity('states')
+export class State {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, length: 30, type: 'varchar' })
+  @Column({ length: 40, nullable: false })
   name: string;
 
-  @Column({ unique: true, nullable: false, length: 254, type: 'varchar' })
-  email: string;
-
-  @Column({ nullable: false, type: 'varchar', length: 20 })
-  phone: string;
-
-  @Column({ nullable: false, type: 'varchar', length: 255 })
-  password: string;
+  @ManyToOne(() => Country, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'country_id' })
+  country: Country;
 
   @CreateDateColumn({
     type: 'timestamptz',

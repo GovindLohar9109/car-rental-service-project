@@ -1,30 +1,18 @@
 import {
   Entity,
   Column,
-  Index,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
 } from 'typeorm';
-
-@Entity('users')
-@Index(['name', 'deletedAt'])
-export class User {
+@Entity('countries')
+export class Country {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ nullable: false, length: 30, type: 'varchar' })
+  @Column({ length: 40, nullable: false })
   name: string;
-
-  @Column({ unique: true, nullable: false, length: 254, type: 'varchar' })
-  email: string;
-
-  @Column({ nullable: false, type: 'varchar', length: 20 })
-  phone: string;
-
-  @Column({ nullable: false, type: 'varchar', length: 255 })
-  password: string;
 
   @CreateDateColumn({
     type: 'timestamptz',

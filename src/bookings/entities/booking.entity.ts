@@ -9,9 +9,10 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
-import { CarStatus } from '../enums/car-status.enum';
-@Entity('cars')
-export class Car {
+import { Car } from 'src/cars/entities/car.entity';
+import { BookingStatus } from '../enums/booking.enum';
+@Entity('bookings')
+export class Booking {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -22,30 +23,24 @@ export class Car {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ type: 'enum', nullable: false, enum: CarStatus })
-  status: CarStatus;
+  @ManyToOne(() => Car, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  @JoinColumn({ name: 'car_id' })
+  car: Car;
 
   @Column({ type: 'float', nullable: false })
   price: number;
 
-  @Column({ length: 20, nullable: false })
-  type: string;
+  @Column({ type: 'enum', enum: BookingStatus })
+  status: BookingStatus;
 
-  @Column({ length: 50, nullable: false })
-  model: string;
+  @Column({ name: 'start_date', nullable: false, type: 'timestamptz' })
+  startDate: Date;
 
-  @Column({ length: 25, nullable: false })
-  color: string;
-
-  @Column({ name: 'total_seat', nullable: false })
-  totalSeat: number;
-
-  @Column({
-    name: 'insurance_expiration_date',
-    nullable: false,
-    type: 'timestamptz',
-  })
-  insuranceExpirationDate: Date;
+  @Column({ name: 'end_date', nullable: false, type: 'timestamptz' })
+  endDate: Date;
 
   @CreateDateColumn({
     type: 'timestamptz',
