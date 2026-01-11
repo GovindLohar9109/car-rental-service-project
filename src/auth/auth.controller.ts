@@ -19,7 +19,8 @@ import { LoginAuthDto } from './dto/login.dto';
 import { RegisterResponseDto } from './dto/registerResponse.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
 import { RefreshResponseDto } from './dto/refreshResponse.dto';
-
+import { Public } from '../common/decorators/public.decorator';
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {} // here is DI

@@ -11,6 +11,7 @@ import { PaginationDto } from '../common/dto/pagination.dto';
 @Controller('feedbacks')
 export class FeedbackController {
   constructor(private readonly feedbackService: FeedbackService) {}
+
   @Get()
   @HttpCode(200)
   async getAllFeedbacks(@Query() query: PaginationDto) {
