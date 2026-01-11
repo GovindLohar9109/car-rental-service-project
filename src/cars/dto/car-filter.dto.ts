@@ -1,4 +1,4 @@
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 import { CarStatus } from '../enums/car-status.enum';
 
 export class CarFilterDto {
@@ -11,10 +11,10 @@ export class CarFilterDto {
   location: number;
 
   @IsOptional()
-  @IsDate()
-  startDateTime: string;
+  @IsDateString()
+  startDateTime: Date;
 
   @IsOptional()
-  @IsDate()
-  endDateTime: string;
+  @IsDateString()
+  endDateTime: Date;
 }

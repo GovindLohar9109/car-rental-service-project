@@ -1,13 +1,13 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsNumber, IsString } from 'class-validator';
 import { BookingStatus } from '../enums/booking.enum';
 
 export class CreateBookingDto {
   @IsNotEmpty()
-  @IsDate()
+  @IsDateString()
   readonly startDate: Date;
 
-  @IsDate()
   @IsNotEmpty()
+  @IsDateString()
   readonly endDate: Date;
 
   @IsNotEmpty()

@@ -3,7 +3,6 @@ import {
   HttpCode,
   Get,
   HttpException,
-  HttpStatus,
   Query,
   Param,
   Body,
@@ -12,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { CarFilterDto } from './dto/car-filter.dto';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 
 @Controller('cars')
@@ -21,16 +19,13 @@ export class CarController {
 
   @Get()
   @HttpCode(200)
-  async getAllCar(
-    @Query() query: PaginationDto,
-    @Query() carFilterDto: CarFilterDto,
-  ) {
+  async getAllCar(@Query() query: PaginationDto) {
     try {
-      const result = await this.carService.getAllCar(query, carFilterDto);
-      console.log(result);
+      const result = await this.carService.getAllCar(query);
+
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -49,7 +44,7 @@ export class CarController {
         createBookingDto,
       );
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 }

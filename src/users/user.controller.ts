@@ -20,6 +20,7 @@ import { UpdateUserAddressDto } from './dto/update-user-address.dto';
 import { CreateCarDto } from '../cars/dto/create-car.dto';
 
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
+import { CarFilterDto } from 'src/cars/dto/car-filter.dto';
 
 @Controller('users')
 export class UserController {

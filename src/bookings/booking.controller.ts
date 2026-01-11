@@ -13,7 +13,6 @@ import {
 
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { BookingService } from './booking.service';
-import { BookingFilterDto } from './dto/booking-filter.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 
 @Controller('bookings')
@@ -22,15 +21,9 @@ export class BookingController {
 
   @Get()
   @HttpCode(200)
-  async getAllBookings(
-    @Query() query: PaginationDto,
-    @Query() bookingFilterDto: BookingFilterDto,
-  ) {
+  async getAllBookings(@Query() query: PaginationDto) {
     try {
-      const result = await this.bookingService.getAllBookings(
-        query,
-        bookingFilterDto,
-      );
+      const result = await this.bookingService.getAllBookings(query);
 
       return result;
     } catch (err) {
@@ -44,13 +37,11 @@ export class BookingController {
     @Param('bookingId') bookingId: string,
     @Query()
     query: PaginationDto,
-    @Query() bookingFilterDto: BookingFilterDto,
   ) {
     try {
       const result = await this.bookingService.getOneBookingAllHistories(
         +bookingId,
         query,
-        bookingFilterDto,
       );
 
       return result;

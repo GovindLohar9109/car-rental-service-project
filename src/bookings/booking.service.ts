@@ -6,7 +6,6 @@ import { PaginationDto } from '../common/dto/pagination.dto';
 import { Booking } from '../bookings/entities/booking.entity';
 import { BookingHistory } from '../bookings/entities/booking-history';
 import { Car } from '../cars/entities/car.entity';
-import { BookingFilterDto } from './dto/booking-filter.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { BookingStatus } from './enums/booking.enum';
 import { CarStatus } from '../cars/enums/car-status.enum';
@@ -22,31 +21,28 @@ export class BookingService {
     private readonly carRepository: Repository<Car>,
   ) {}
 
-  async getAllBookings(
-    query: PaginationDto,
-    bookingFilterDto: BookingFilterDto,
-  ) {
-    let { page, limit } = query;
+  async getAllBookings(paginationDto: PaginationDto) {
+    let { page, limit } = paginationDto;
 
     try {
       page = page ? page : 1;
       limit = limit ? limit : 10;
       const skipRows = (page - 1) * limit;
-      const bookings = await this.bookingRepository
+
+      const [bookings, totalRecords] = await this.bookingRepository
         .createQueryBuilder('booking')
         .innerJoinAndSelect('booking.car', 'car')
         .innerJoinAndSelect('booking.user', 'user')
         .limit(limit)
         .skip(skipRows)
-        .getMany();
+        .getManyAndCount();
 
-      // const totalPages = Math.ceil(totalRecords / limit);
-
+      const totalPages = Math.ceil(totalRecords / limit);
       const result = {
         status: true,
         data: bookings,
-
-        // pagination: { page, limit, totalPages },
+        totalBookings: totalRecords,
+        pagination: { page, limit, totalPages },
       };
 
       return result;
@@ -60,10 +56,9 @@ export class BookingService {
 
   async getOneBookingAllHistories(
     bookingId: number,
-    query: PaginationDto,
-    bookingFilterDto: BookingFilterDto,
+    paginationDto: PaginationDto,
   ) {
-    let { page, limit } = query;
+    let { page, limit } = paginationDto;
 
     try {
       page = page ? page : 1;
@@ -74,7 +69,6 @@ export class BookingService {
           where: { booking: { id: bookingId } },
         });
 
-      console.log(bookings);
       const totalPages = Math.ceil(totalRecords / limit);
 
       const result = {
@@ -146,8 +140,9 @@ export class BookingService {
         existBooking.status == BookingStatus.ONGOING
           ? CarStatus.BOOKED
           : CarStatus.AVAILABLE;
+
       await this.carRepository.update(
-        { user: { id: existBooking.user.id } },
+        { id: existBooking.car.id },
         { status: carStatus },
       );
 

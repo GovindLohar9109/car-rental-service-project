@@ -1,10 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
-import { In, Repository } from 'typeorm';
+import { In, Not, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatus } from '@nestjs/common';
 import { Car } from './entities/car.entity';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { CarFilterDto } from './dto/car-filter.dto';
+
 import { CarStatus } from './enums/car-status.enum';
 import { UserAddress } from '../users/entities/user-address.entity';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
@@ -24,8 +24,8 @@ export class CarService {
     private readonly bookingHistoryRepository: Repository<BookingHistory>,
   ) {}
 
-  async getAllCar(query: PaginationDto, carFilterDto: CarFilterDto) {
-    let { page, limit } = query;
+  async getAllCar(paginationDto: PaginationDto) {
+    let { page, limit } = paginationDto;
 
     try {
       page = page ? page : 1;
@@ -36,21 +36,80 @@ export class CarService {
         .createQueryBuilder('ua')
         .innerJoin('ua.address', 'address')
         .innerJoin('ua.user', 'user')
-        .select('user.id', 'userId');
+        .select('user.id', 'userId')
+        .limit(limit)
+        .skip(skipRows);
 
-      if (carFilterDto.location) {
+      if (paginationDto.locationId) {
         qb.andWhere('address.id = :addressId', {
-          addressId: carFilterDto.location,
+          addressId: paginationDto.locationId,
         });
       }
 
       let users = await qb.getRawMany();
       users = users.flatMap((user) => user.userId);
 
-      const whereCondition = [
-        { status: carFilterDto.status ?? CarStatus.AVAILABLE },
-        { user: { id: In(users) } },
-      ];
+      // validation on startDate and endDate
+      /*.
+        1. Start Date must be at least 1 hour more then current date
+        2. StartDate and End Date difference must be at least 3 hour
+        3. StartDate must be less then endDate
+      
+       */
+      const ONE_HOUR = 60 * 60 * 1000;
+      const THREE_HOURS = 3 * ONE_HOUR;
+
+      const now = Date.now();
+
+      const reqStartDate = paginationDto.startDate
+        ? new Date(paginationDto.startDate)
+        : new Date(now + ONE_HOUR);
+
+      const reqEndDate = paginationDto.endDate
+        ? new Date(paginationDto.endDate)
+        : new Date(now + 5 * ONE_HOUR);
+
+      if (reqEndDate <= reqStartDate) {
+        throw new HttpException(
+          'endDate must be greater than startDate',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const durationMs = reqEndDate.getTime() - reqStartDate.getTime();
+
+      if (durationMs < THREE_HOURS) {
+        throw new HttpException(
+          'Booking duration must be at least 3 hours',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (reqStartDate.getTime() < now + ONE_HOUR) {
+        throw new HttpException(
+          'startDate must be at least 1 hour after current time',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      //getting all booking which are overlapping
+      const notAvailableBookings = await this.bookingRepository
+        .createQueryBuilder('b')
+        .where('b.startDate < :reqEndDate AND b.endDate > :reqStartDate', {
+          reqStartDate,
+          reqEndDate,
+        })
+        .getRawMany();
+
+      const notAvailableCarIds = notAvailableBookings.map(
+        (booking) => booking.b_car_id,
+      );
+
+      const whereCondition = {
+        status: paginationDto.status ?? CarStatus.AVAILABLE,
+        user: { id: In(users) },
+        id: Not(In(notAvailableCarIds)),
+      };
 
       const [cars, totalRecords] = await this.carRepository.findAndCount({
         where: whereCondition,
@@ -90,13 +149,16 @@ export class CarService {
         endDate: createBookingDto.endDate,
         status: createBookingDto.status,
       };
+
       const newBooking = this.bookingRepository.create(bookingData);
 
-      await this.bookingRepository.save(bookingData);
-      await this.bookingHistoryRepository.save({
-        booking: { id: newBooking.id },
+      const savedBooking = await this.bookingRepository.save(bookingData);
+      const newBookingHistory = this.bookingHistoryRepository.create({
+        booking: { id: savedBooking.id },
         ...newBooking,
       });
+
+      await this.bookingHistoryRepository.save(newBookingHistory);
 
       return { status: true, message: 'Car is booked ...' };
     } catch (error) {
