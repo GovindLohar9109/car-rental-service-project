@@ -1,45 +1,25 @@
 import {
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
+  HttpCode,
+  HttpException,
+  Query,
 } from '@nestjs/common';
-import { FeedbacksService } from './feedback.service';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { FeedbackService } from './feedback.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
 @Controller('feedbacks')
-export class FeedbacksController {
-  constructor(private readonly feedbacksService: FeedbacksService) {}
-
-  @Post()
-  create(@Body() createFeedbackDto: CreateFeedbackDto) {
-    return this.feedbacksService.create(createFeedbackDto);
-  }
-
+export class FeedbackController {
+  constructor(private readonly feedbackService: FeedbackService) {}
   @Get()
-  findAll() {
-    return this.feedbacksService.findAll();
-  }
+  @HttpCode(200)
+  async getAllFeedbacks(@Query() query: PaginationDto) {
+    try {
+      const result = await this.feedbackService.getAllFeedbacks(query);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.feedbacksService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateFeedbackDto: UpdateFeedbackDto,
-  ) {
-    return this.feedbacksService.update(+id, updateFeedbackDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.feedbacksService.remove(+id);
+      return result;
+    } catch (err) {
+      throw new HttpException(err.message, err.status);
+    }
   }
 }

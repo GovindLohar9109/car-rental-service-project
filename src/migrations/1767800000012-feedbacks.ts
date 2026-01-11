@@ -37,6 +37,12 @@ export class Feedback1767800000012 implements MigrationInterface {
             isNullable: false,
           },
           {
+            name: 'rating',
+            type: 'float',
+
+            isNullable: false,
+          },
+          {
             name: 'created_at',
             type: 'timestamptz',
             isNullable: false,

@@ -9,6 +9,8 @@ import { Car } from '../cars/entities/car.entity';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { BookingStatus } from './enums/booking.enum';
 import { CarStatus } from '../cars/enums/car-status.enum';
+import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
+import { Feedback } from '../feedbacks/entities/feedback.entity';
 
 @Injectable()
 export class BookingService {
@@ -19,6 +21,8 @@ export class BookingService {
     private readonly bookingHistoryRepository: Repository<BookingHistory>,
     @InjectRepository(Car)
     private readonly carRepository: Repository<Car>,
+    @InjectRepository(Feedback)
+    private readonly feedbackRepository: Repository<Feedback>,
   ) {}
 
   async getAllBookings(paginationDto: PaginationDto) {
@@ -67,6 +71,8 @@ export class BookingService {
       const [bookings, totalRecords] =
         await this.bookingHistoryRepository.findAndCount({
           where: { booking: { id: bookingId } },
+          take: limit,
+          skip: skipRows,
         });
 
       const totalPages = Math.ceil(totalRecords / limit);
@@ -129,8 +135,6 @@ export class BookingService {
         status: existBooking.status,
       };
 
-      //
-
       // // //updating booking history status
       await this.bookingHistoryRepository.save(
         this.bookingHistoryRepository.create(newHistory),
@@ -159,6 +163,31 @@ export class BookingService {
     try {
       await this.bookingRepository.softDelete(bookingId);
       return { status: true, message: 'Booking deleted...' };
+    } catch (error) {
+      throw new HttpException(
+        error?.message || 'Internal Server Error',
+        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async addFeedback(
+    userId: number,
+    bookingId: number,
+    createFeedbackDto: CreateFeedbackDto,
+  ) {
+    try {
+      const feedbackData: object = {
+        user: { id: userId },
+        booking: { id: bookingId },
+        rating: createFeedbackDto.rating,
+        description: createFeedbackDto.description,
+      };
+
+      const newFeedback = this.feedbackRepository.create(feedbackData);
+      await this.feedbackRepository.save(newFeedback);
+
+      return { status: true, message: 'Feedback is added ...' };
     } catch (error) {
       throw new HttpException(
         error?.message || 'Internal Server Error',

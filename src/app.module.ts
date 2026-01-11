@@ -14,6 +14,7 @@ import { AuthMiddleware } from './shared/middlewares/auth.middleware';
 import { AuthModule } from './auth/auth.module';
 import { CarModule } from './cars/car.module';
 import { BookingModule } from './bookings/booking.module';
+import { FeedbackModule } from './feedbacks/feedback.module';
 dotenv.config();
 
 @Module({
@@ -38,6 +39,7 @@ dotenv.config();
     AuthModule,
     CarModule,
     BookingModule,
+    FeedbackModule,
   ],
   controllers: [],
   providers: [],

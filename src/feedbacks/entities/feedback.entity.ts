@@ -34,6 +34,9 @@ export class Feedback {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
+  @Column({ type: 'float' })
+  rating: number;
+
   @Column({
     type: 'varchar',
     length: 255,

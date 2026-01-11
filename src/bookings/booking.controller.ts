@@ -9,11 +9,14 @@ import {
   Body,
   Delete,
   Patch,
+  Post,
+  Req,
 } from '@nestjs/common';
 
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { BookingService } from './booking.service';
 import { UpdateBookingDto } from './dto/update-booking.dto';
+import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
 
 @Controller('bookings')
 export class BookingController {
@@ -27,7 +30,7 @@ export class BookingController {
 
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -46,7 +49,7 @@ export class BookingController {
 
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -58,7 +61,7 @@ export class BookingController {
 
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
   @Patch(':bookingId')
@@ -70,7 +73,7 @@ export class BookingController {
     try {
       return this.bookingService.updateBooking(+bookingId, updateBookingDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -80,7 +83,26 @@ export class BookingController {
     try {
       return await this.bookingService.removeBooking(+bookingId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
+    }
+  }
+
+  @Post(':bookingId/feedbacks')
+  @HttpCode(201)
+  async addFeedback(
+    @Req() req: any,
+    @Param('bookingId') bookingId: string,
+    @Body() createFeedbackDto: CreateFeedbackDto,
+  ) {
+    try {
+      const userId = req.user.userId;
+      return await this.bookingService.addFeedback(
+        +userId,
+        +bookingId,
+        createFeedbackDto,
+      );
+    } catch (err) {
+      throw new HttpException(err.message, err.status);
     }
   }
 }
