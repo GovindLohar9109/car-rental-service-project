@@ -9,6 +9,7 @@ import { UserAddress } from '../users/entities/user-address.entity';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 import { Booking } from '../bookings/entities/booking.entity';
 import { BookingHistory } from '../bookings/entities/booking-history';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class CarService {
@@ -21,6 +22,8 @@ export class CarService {
     private readonly bookingRepository: Repository<Booking>,
     @InjectRepository(BookingHistory)
     private readonly bookingHistoryRepository: Repository<BookingHistory>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getAllCar(paginationDto: PaginationDto) {
@@ -149,6 +152,17 @@ export class CarService {
         status: createBookingDto.status,
       };
 
+      // const car = await this.carRepository.find({
+      //   where: { id: carId },
+      // });
+
+      // const ownerEmail = car.ownerEmail;
+
+      const user = await this.userRepository.findOneBy({ id: userId });
+
+      // const ownerEmail = car.user.email;
+      const userEmail = user.email;
+
       const newBooking = this.bookingRepository.create(bookingData);
 
       const savedBooking = await this.bookingRepository.save(bookingData);
@@ -159,7 +173,12 @@ export class CarService {
 
       await this.bookingHistoryRepository.save(newBookingHistory);
 
-      return { status: true, message: 'Car is booked ...' };
+      return {
+        status: true,
+        message: 'Car is booked ...',
+
+        userEmail,
+      };
     } catch (error) {
       throw new HttpException(
         error?.message || 'Internal Server Error',

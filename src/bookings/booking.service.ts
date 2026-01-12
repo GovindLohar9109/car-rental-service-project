@@ -11,6 +11,7 @@ import { BookingStatus } from './enums/booking.enum';
 import { CarStatus } from '../cars/enums/car-status.enum';
 import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
 import { Feedback } from '../feedbacks/entities/feedback.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class BookingService {
@@ -23,6 +24,8 @@ export class BookingService {
     private readonly carRepository: Repository<Car>,
     @InjectRepository(Feedback)
     private readonly feedbackRepository: Repository<Feedback>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getAllBookings(paginationDto: PaginationDto) {
@@ -113,7 +116,11 @@ export class BookingService {
     }
   }
 
-  async updateBooking(bookingId: number, updateBookingDto: UpdateBookingDto) {
+  async updateBooking(
+    userId: number,
+    bookingId: number,
+    updateBookingDto: UpdateBookingDto,
+  ) {
     try {
       //updaing booking status
       await this.bookingRepository.update(
@@ -125,6 +132,7 @@ export class BookingService {
         where: { id: bookingId },
         relations: ['user', 'car'],
       });
+
       const newHistory: object = {
         booking: { id: bookingId },
         user: { id: existBooking.user.id },
@@ -135,7 +143,8 @@ export class BookingService {
         status: existBooking.status,
       };
 
-      // // //updating booking history status
+      const user = await this.userRepository.findOneBy({ id: userId });
+      // //updating booking history status
       await this.bookingHistoryRepository.save(
         this.bookingHistoryRepository.create(newHistory),
       );
@@ -150,7 +159,11 @@ export class BookingService {
         { status: carStatus },
       );
 
-      return { status: true, message: 'Booking  updated...' };
+      return {
+        status: true,
+        message: 'Booking  updated...',
+        ownerEmail: user.email,
+      };
     } catch (error) {
       throw new HttpException(
         error?.message || 'Internal Server Error',

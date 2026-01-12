@@ -20,17 +20,32 @@ import { RegisterResponseDto } from './dto/registerResponse.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
 import { RefreshResponseDto } from './dto/refreshResponse.dto';
 import { Public } from '../common/decorators/public.decorator';
+import { MailService } from 'src/mail/mail.service';
+
 @Public()
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {} // here is DI
+  constructor(
+    private readonly authService: AuthService,
+    private readonly mailService: MailService,
+  ) {} // here is DI
 
   @Post('register')
   @HttpCode(201)
-  async userRegister(
-    @Body() registerAuthDto: RegisterAuthDto,
-  ): Promise<RegisterResponseDto> {
-    return await this.authService.userRegister(registerAuthDto);
+  async userRegister(@Body() registerAuthDto: RegisterAuthDto) {
+    try {
+      const result = await this.authService.userRegister(registerAuthDto);
+      await this.mailService.sendMail(
+        registerAuthDto.email,
+        'Welcome to Car Rental Service',
+        'Your account has been created',
+        `<h1>Welcome!</h1><p>Thanks for registering.</p>`,
+      );
+      result.message += 'and mail sent';
+      return result;
+    } catch (error) {
+      throw new HttpException(error?.message, error?.status);
+    }
   }
   @Post('login')
   @HttpCode(200)

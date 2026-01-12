@@ -1,7 +1,5 @@
 import {
-  IsDate,
   IsDateString,
-  IsInt,
   IsNotEmpty,
   IsNumber,
   IsString,

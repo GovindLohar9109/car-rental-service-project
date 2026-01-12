@@ -1,11 +1,13 @@
 // health.controller.ts
 import { Controller, Get, ServiceUnavailableException } from '@nestjs/common';
+import { Public } from '../common/decorators/public.decorator';
 import { DataSource } from 'typeorm';
 
 @Controller('health')
 export class HealthController {
   constructor(private readonly dataSource: DataSource) {}
 
+  @Public()
   @Get()
   async checkHealth() {
     try {

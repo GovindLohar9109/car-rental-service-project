@@ -13,6 +13,7 @@ import { FeedbackModule } from './feedbacks/feedback.module';
 import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/role.guard';
+import { MailModule } from './mail/main.module';
 dotenv.config();
 
 @Module({
@@ -38,6 +39,7 @@ dotenv.config();
     CarModule,
     BookingModule,
     FeedbackModule,
+    MailModule,
   ],
   controllers: [],
   providers: [

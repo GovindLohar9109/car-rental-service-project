@@ -12,10 +12,16 @@ import {
 import { CarService } from './car.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
+import { MailService } from '../mail/mail.service';
+import { Roles } from '../common/decorators/role.decorator';
+import { UserRoleEnum } from 'src/common/enums/role.enum';
 
 @Controller('cars')
 export class CarController {
-  constructor(private readonly carService: CarService) {} // here is DI
+  constructor(
+    private readonly carService: CarService,
+    private readonly mailService: MailService,
+  ) {} // here is DI
 
   @Get()
   @HttpCode(200)
@@ -29,6 +35,7 @@ export class CarController {
     }
   }
 
+  @Roles(UserRoleEnum.USER)
   @Post(':carId/bookings')
   @HttpCode(201)
   async addBooking(
@@ -38,11 +45,35 @@ export class CarController {
   ) {
     try {
       const userId = req.user.userId;
-      return await this.carService.addBooking(
+      const { status, message, userEmail } = await this.carService.addBooking(
         +userId,
         +carId,
         createBookingDto,
       );
+
+      // sending to user who booked car
+      const startDate = new Date(createBookingDto.startDate);
+      const endDate = new Date(createBookingDto.endDate);
+      await this.mailService.sendMail(
+        userEmail,
+        'Welcome to Car Rental Service',
+        `Your car has been booked from 
+          ${startDate} to 
+          ${endDate}`,
+        `<h1>Welcome!</h1><p>Thanks for booking.</p>`,
+      );
+
+      // //sending to car owner
+      // await this.mailService.sendMail(
+      //   ownerEmail,
+      //   'Welcome to Car Owner  ',
+      //   `Your car which id is ${carId} has been booked from by ${userEmail} from` +
+      //     createBookingDto.startDate +
+      //     ' to ' +
+      //     createBookingDto.endDate,
+      //   ``,
+      // );
+      return { status, message };
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }
