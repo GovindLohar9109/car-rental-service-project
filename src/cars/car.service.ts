@@ -27,12 +27,10 @@ export class CarService {
   ) {}
 
   async getAllCar(paginationDto: PaginationDto) {
-    let { page, limit } = paginationDto;
+    const { page = 1, limit = 10 } = paginationDto;
 
     try {
-      page = page ? page : 1;
-      limit = limit ? limit : 10;
-      const skipRows = Math.max(0, (page - 1) * limit);
+      const skipRows = (page - 1) * limit;
 
       const qb = this.userAddressRepository
         .createQueryBuilder('ua')
@@ -108,10 +106,13 @@ export class CarService {
         (booking) => booking.b_car_id,
       );
 
-      const whereCondition = {
-        status: paginationDto.status ?? CarStatus.AVAILABLE,
+      const whereCondition: any = {
+        status: paginationDto.status ?? undefined,
         user: { id: In(users) },
         id: Not(In(notAvailableCarIds)),
+        type: paginationDto.type ?? undefined,
+        model: paginationDto.model ?? undefined,
+        color: paginationDto.color ?? undefined,
       };
 
       const [cars, totalRecords] = await this.carRepository.findAndCount({
