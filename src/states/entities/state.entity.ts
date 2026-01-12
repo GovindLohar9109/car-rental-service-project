@@ -9,7 +9,11 @@ import {
   JoinColumn,
   Index,
 } from 'typeorm';
+<<<<<<< HEAD
 import { Country } from '../../countries/entities/country.entity';
+=======
+import { Country } from '../../countries/entities/country.entities';
+>>>>>>> ba79b8aa6593304b54d12dd31e378ae03dc1c476
 @Entity('states')
 @Index(['country', 'name', 'deletedAt'])
 export class State {
