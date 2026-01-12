@@ -92,9 +92,19 @@ export class BookingController {
 
       await this.mailService.sendMail(
         ownerEmail,
-        'Welcome to Car Rental Owner',
-        `Your car status ${updateBookingDto.status}`,
-        ``,
+        'Car Status Update – Owner Notification',
+        `Hello,
+          This is to inform you that the status of your booking  has been updated in our system.
+          1. Booking ID: ${bookingId}
+          2. Updated Status: ${updateBookingDto.status}
+
+          Please review the update and ensure everything is in order.
+          Thank you for being a valued partner with Car Rental Service.
+
+        Kind regards,
+        Car Rental Service Team
+  `,
+        '',
       );
 
       return { status, message };

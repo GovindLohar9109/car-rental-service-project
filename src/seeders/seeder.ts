@@ -17,9 +17,7 @@ async function runSeeder() {
     await stateSeeder(dataSource);
     await citySeeder(dataSource);
     await app.close();
-  } catch (error) {
-    console.error('failed to seed data', error);
-  }
+  } catch (error) {}
 }
 
 runSeeder();

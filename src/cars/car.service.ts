@@ -152,15 +152,12 @@ export class CarService {
         status: createBookingDto.status,
       };
 
-      // const car = await this.carRepository.find({
-      //   where: { id: carId },
-      // });
-
-      // const ownerEmail = car.ownerEmail;
-
+      const car = await this.carRepository.findOne({
+        where: { id: carId },
+        relations: { user: true },
+      });
       const user = await this.userRepository.findOneBy({ id: userId });
-
-      // const ownerEmail = car.user.email;
+      const ownerEmail = car.user.email;
       const userEmail = user.email;
 
       const newBooking = this.bookingRepository.create(bookingData);
@@ -176,7 +173,7 @@ export class CarService {
       return {
         status: true,
         message: 'Car is booked ...',
-
+        ownerEmail,
         userEmail,
       };
     } catch (error) {
