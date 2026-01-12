@@ -1,5 +1,6 @@
 import {
   IsDate,
+  IsDateString,
   IsInt,
   IsNotEmpty,
   IsNumber,
@@ -7,6 +8,7 @@ import {
   Max,
   MaxLength,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class CreateCarDto {
@@ -16,13 +18,13 @@ export class CreateCarDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(2)
+  @MinLength(2)
   @MaxLength(20)
   readonly type: string;
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(2)
+  @MinLength(2)
   @MaxLength(50)
   readonly model: string;
 
@@ -31,7 +33,7 @@ export class CreateCarDto {
 
   @IsString()
   @IsNotEmpty()
-  @MaxLength(3)
+  @MinLength(3)
   @MaxLength(25)
   readonly color: string;
 
@@ -41,11 +43,7 @@ export class CreateCarDto {
   @IsNotEmpty()
   readonly totalSeat: number;
 
-  @IsInt()
-  @IsNotEmpty()
-  readonly userId: number;
-
-  @IsDate()
+  @IsDateString()
   @IsNotEmpty()
   readonly insuranceExpirationDate: Date;
 }

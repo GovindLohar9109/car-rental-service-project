@@ -10,6 +10,8 @@ import {
   Index,
 } from 'typeorm';
 import { State } from '../../states/entities/state.entity';
+import { Expose } from 'class-transformer';
+@Expose()
 @Entity('cities')
 @Index(['state', 'name', 'deletedAt'])
 export class City {
@@ -24,6 +26,7 @@ export class City {
   })
   @JoinColumn({ name: 'state_id' })
   state: State;
+
   @CreateDateColumn({
     type: 'timestamptz',
     name: 'created_at',

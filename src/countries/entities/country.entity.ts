@@ -13,7 +13,7 @@ export class Country {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 40, nullable: false })
+  @Column({ length: 40, nullable: false, unique: true })
   name: string;
 
   @CreateDateColumn({

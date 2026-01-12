@@ -1,5 +1,4 @@
 export enum CarStatus {
   AVAILABLE = 'AVAILABLE',
   BOOKED = 'BOOKED',
-  IN_SERVICE = 'IN_SERVICE',
 }

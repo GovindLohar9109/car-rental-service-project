@@ -12,11 +12,52 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Car } from '../../cars/entities/car.entity';
 import { BookingStatus } from '../enums/booking.enum';
+import { Exclude, Expose } from 'class-transformer';
+@Expose()
 @Entity('bookings')
 @Index(['user', 'car', 'status', 'deletedAt'])
 export class Booking {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column({ type: 'float', nullable: false, name: 'total_amount' })
+  totalAmount: number;
+
+  @Column({ type: 'enum', enum: BookingStatus })
+  status: BookingStatus;
+
+  @Column({ name: 'start_date', nullable: false, type: 'timestamptz' })
+  startDate: Date;
+
+  @Column({ name: 'end_date', nullable: false, type: 'timestamptz' })
+  endDate: Date;
+
+  @Exclude()
+  @CreateDateColumn({
+    type: 'timestamptz',
+    name: 'created_at',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMPZ',
+  })
+  createdAt: Date;
+
+  @Exclude()
+  @UpdateDateColumn({
+    type: 'timestamptz',
+    name: 'updated_at',
+    nullable: false,
+    default: () => 'CURRENT_TIMESTAMPZ',
+  })
+  updatedAt: Date;
+
+  @Exclude()
+  @DeleteDateColumn({
+    type: 'timestamptz',
+    name: 'deleted_at',
+    nullable: true,
+    default: null,
+  })
+  deletedAt: Date;
 
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
@@ -31,40 +72,4 @@ export class Booking {
   })
   @JoinColumn({ name: 'car_id' })
   car: Car;
-
-  @Column({ type: 'float', nullable: false })
-  price: number;
-
-  @Column({ type: 'enum', enum: BookingStatus })
-  status: BookingStatus;
-
-  @Column({ name: 'start_date', nullable: false, type: 'timestamptz' })
-  startDate: Date;
-
-  @Column({ name: 'end_date', nullable: false, type: 'timestamptz' })
-  endDate: Date;
-
-  @CreateDateColumn({
-    type: 'timestamptz',
-    name: 'created_at',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMPZ',
-  })
-  createdAt: Date;
-
-  @UpdateDateColumn({
-    type: 'timestamptz',
-    name: 'updated_at',
-    nullable: false,
-    default: () => 'CURRENT_TIMESTAMPZ',
-  })
-  updatedAt: Date;
-
-  @DeleteDateColumn({
-    type: 'timestamptz',
-    name: 'deleted_at',
-    nullable: true,
-    default: null,
-  })
-  deletedAt: Date;
 }

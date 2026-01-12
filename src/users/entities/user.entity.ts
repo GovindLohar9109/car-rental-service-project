@@ -10,8 +10,10 @@ import {
 } from 'typeorm';
 import { UserRole } from './user-role.entity';
 import { UserAddress } from './user-address.entity';
-
+import { Exclude, Expose } from 'class-transformer';
+@Expose()
 @Entity('users')
+@Index('users_email_deleted_at_cuidx', ['email', 'deletedAt'], { unique: true })
 @Index(['name', 'deletedAt'])
 export class User {
   @PrimaryGeneratedColumn()
@@ -26,9 +28,11 @@ export class User {
   @Column({ nullable: false, type: 'varchar', length: 20 })
   phone: string;
 
+  @Exclude()
   @Column({ nullable: false, type: 'varchar', length: 255 })
   password: string;
 
+  @Exclude()
   @CreateDateColumn({
     type: 'timestamptz',
     name: 'created_at',
@@ -37,6 +41,7 @@ export class User {
   })
   createdAt: Date;
 
+  @Exclude()
   @UpdateDateColumn({
     type: 'timestamptz',
     name: 'updated_at',
@@ -45,6 +50,7 @@ export class User {
   })
   updatedAt: Date;
 
+  @Exclude()
   @DeleteDateColumn({
     type: 'timestamptz',
     name: 'deleted_at',
@@ -52,6 +58,7 @@ export class User {
     default: null,
   })
   deletedAt: Date;
+
   @OneToMany(() => UserRole, (userRole) => userRole.user)
   userRoles: UserRole[];
 

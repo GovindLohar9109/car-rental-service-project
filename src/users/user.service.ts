@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatus } from '@nestjs/common';
@@ -14,20 +14,21 @@ import { Address } from './entities/address.entity';
 import { UserAddress } from './entities/user-address.entity';
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
 import { Car } from '../cars/entities/car.entity';
-import { CreateCarDto } from 'src/cars/dto/create-car.dto';
+import { CreateCarDto } from '../cars/dto/create-car.dto';
+import { CarStatus } from 'src/cars/enums/car-status.enum';
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UserService {
-  userRepository: any;
   constructor(
-    @InjectRepository(User) // this will only work when add entity into  typeOrmModule.forFeature([User])
-    private readonly userRepogistry: Repository<User>,
     @InjectRepository(UserAddress)
     private readonly userAddressRepository: Repository<UserAddress>,
     @InjectRepository(Address)
     private readonly addressRepository: Repository<Address>,
     @InjectRepository(Car)
     private readonly carRepository: Repository<Car>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   async getAllUsers(query: PaginationDto) {
@@ -35,7 +36,7 @@ export class UserService {
 
     try {
       const skipRows = (page - 1) * limit;
-      const [users, totalRecords] = await this.userRepogistry
+      const [users, totalRecords] = await this.userRepository
         .createQueryBuilder('user')
         .leftJoin('user.userRoles', 'ur')
         .leftJoin('ur.role', 'role')
@@ -83,7 +84,7 @@ export class UserService {
 
   async getUser(userId: number) {
     try {
-      const userData = await this.userRepogistry.findOne({
+      const userData = await this.userRepository.findOne({
         where: { id: userId },
         relations: {
           userRoles: { role: true },
@@ -115,7 +116,7 @@ export class UserService {
   }
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
     try {
-      const userData = await this.userRepogistry.findOneBy({
+      const userData = await this.userRepository.findOneBy({
         id: userId,
       });
       if (!userData) {
@@ -127,7 +128,7 @@ export class UserService {
       if (updateUserDto?.password) {
         updateUserDto.password = generateHashPassword(updateUserDto.password);
       }
-      await this.userRepogistry.update({ id: userId }, { ...updateUserDto });
+      await this.userRepository.update({ id: userId }, { ...updateUserDto });
       return { status: true, message: 'User updated...' };
     } catch (error) {
       throw new HttpException(
@@ -139,7 +140,7 @@ export class UserService {
 
   async removeUser(userId: number) {
     try {
-      await this.userRepogistry.softDelete(userId);
+      await this.userRepository.softDelete(userId);
       return { status: true, message: 'User deleted...' };
     } catch (error) {
       throw new HttpException(
@@ -263,15 +264,14 @@ export class UserService {
         inner join cities city 
         on a.city_id =city.id
         where a.id=$1 AND ua.deleted_at is null`;
+
       const userData = await this.userRepository.findOne({
         where: { id: userId },
-        select: { id: true, name: true, email: true, phone: true },
       });
+
       const userAddress = await this.addressRepository.query(sqlQuery, [
         addressId,
       ]);
-
-      // serilizing data here
 
       return {
         status: true,
@@ -319,6 +319,8 @@ export class UserService {
 
   // -----------------------------CAR SERVICES METHODS-----------------------
 
+  // ----------------ADD NEW CAR-----------------
+
   async addCar(userId: number, createCarDto: CreateCarDto) {
     try {
       const carData: object = {
@@ -327,6 +329,7 @@ export class UserService {
         color: createCarDto.color,
         totalSeat: createCarDto.totalSeat,
         imageUrl: createCarDto.imageUrl,
+        status: CarStatus.AVAILABLE,
         price: createCarDto.price,
         user: { id: userId },
         insuranceExpirationDate: createCarDto.insuranceExpirationDate,
@@ -342,14 +345,23 @@ export class UserService {
       );
     }
   }
-  async getUserAllCars(userId: number, query: PaginationDto) {
-    const { page, limit } = query;
+
+  //------------------ GET USER All CARS SERVICE -------------------
+
+  async getUserAllCars(userId: number, paginationDto: PaginationDto) {
+    let { page, limit } = paginationDto;
 
     try {
+      page = page ? page : 1;
+      limit = limit ? limit : 10;
       const skipRows = (page - 1) * limit;
 
+      const whereCondition = {
+        status: paginationDto.status ?? CarStatus.AVAILABLE,
+        user: { id: userId },
+      };
       const [cars, totalRecords] = await this.carRepository.findAndCount({
-        where: { user: { id: userId } },
+        where: whereCondition,
         select: {
           deletedAt: false,
           user: { name: true, email: true },
@@ -371,17 +383,9 @@ export class UserService {
       );
     }
   }
-  async updateCar(carId: number, updateCarDto: UpdateCarDto) {
-    try {
-      await this.carRepository.update({ id: carId }, { ...updateCarDto });
-      return { status: true, message: 'Car  updated...' };
-    } catch (error) {
-      throw new HttpException(
-        error?.message || 'Internal Server Error',
-        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
-      );
-    }
-  }
+
+  //------------------ GET USER CAR DETAILS -------------------
+
   async getCarDetails(carId: number) {
     try {
       const car = await this.carRepository.findOne({
@@ -399,6 +403,18 @@ export class UserService {
       );
     }
   }
+  async updateCar(carId: number, updateCarDto: UpdateCarDto) {
+    try {
+      await this.carRepository.update({ id: carId }, { ...updateCarDto });
+      return { status: true, message: 'Car  updated...' };
+    } catch (error) {
+      throw new HttpException(
+        error?.message || 'Internal Server Error',
+        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
   async removeCar(carId: number) {
     try {
       await this.carRepository.softDelete(carId);

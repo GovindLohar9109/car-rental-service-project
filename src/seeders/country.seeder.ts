@@ -7,5 +7,5 @@ export default async function countrySeeder(dataSource: DataSource) {
   const countriesData: object = locations.map((location) => {
     return { name: location.country };
   });
-  await countryRepo.save(countryRepo.create(countriesData));
+  await countryRepo.upsert(countryRepo.create(countriesData), ['name']);
 }

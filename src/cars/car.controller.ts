@@ -3,12 +3,15 @@ import {
   HttpCode,
   Get,
   HttpException,
-  HttpStatus,
   Query,
+  Param,
+  Body,
+  Post,
+  Req,
 } from '@nestjs/common';
 import { CarService } from './car.service';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { CarFilterDto } from './dto/car-filter.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 
 @Controller('cars')
 export class CarController {
@@ -16,16 +19,32 @@ export class CarController {
 
   @Get()
   @HttpCode(200)
-  async getAllCar(
-    @Query() query: PaginationDto,
-    @Query() carFilterDto: CarFilterDto,
-  ) {
+  async getAllCar(@Query() query: PaginationDto) {
     try {
-      const result = await this.carService.getAllCar(query, carFilterDto);
-      console.log(result);
+      const result = await this.carService.getAllCar(query);
+
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
+    }
+  }
+
+  @Post(':carId/bookings')
+  @HttpCode(201)
+  async addBooking(
+    @Req() req: any,
+    @Param('carId') carId: string,
+    @Body() createBookingDto: CreateBookingDto,
+  ) {
+    try {
+      const userId = req.user.userId;
+      return await this.carService.addBooking(
+        +userId,
+        +carId,
+        createBookingDto,
+      );
+    } catch (err) {
+      throw new HttpException(err.message, err.status);
     }
   }
 }

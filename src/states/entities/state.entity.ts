@@ -20,7 +20,7 @@ export class State {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ length: 40, nullable: false })
+  @Column({ length: 40, nullable: false, unique: true })
   name: string;
 
   @ManyToOne(() => Country, {
