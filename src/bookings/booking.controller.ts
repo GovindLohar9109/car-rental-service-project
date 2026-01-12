@@ -10,6 +10,7 @@ import {
   Patch,
   Post,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 
 import { PaginationDto } from '../common/dto/pagination.dto';
@@ -19,6 +20,7 @@ import { CreateFeedbackDto } from '../feedbacks/dto/create-feedback.dto';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRoleEnum } from '../common/enums/role.enum';
 import { MailService } from '../mail/mail.service';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('bookings')
 export class BookingController {
@@ -29,6 +31,7 @@ export class BookingController {
 
   @Roles(UserRoleEnum.ADMIN)
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getAllBookings(@Query() query: PaginationDto) {
     try {
@@ -42,6 +45,7 @@ export class BookingController {
 
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.CAR_OWNER)
   @Get(':bookingId/histories')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getOneBookingAllHistories(
     @Param('bookingId') bookingId: string,
@@ -62,6 +66,7 @@ export class BookingController {
 
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.CAR_OWNER)
   @Get(':bookingId')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getBookingDetails(@Param('bookingId') bookingId: string) {
     try {
