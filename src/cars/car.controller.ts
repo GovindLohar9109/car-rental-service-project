@@ -13,6 +13,8 @@ import { CarService } from './car.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 import { MailService } from '../mail/mail.service';
+import { Roles } from '../common/decorators/role.decorator';
+import { UserRoleEnum } from 'src/common/enums/role.enum';
 
 @Controller('cars')
 export class CarController {
@@ -33,6 +35,7 @@ export class CarController {
     }
   }
 
+  @Roles(UserRoleEnum.USER)
   @Post(':carId/bookings')
   @HttpCode(201)
   async addBooking(
