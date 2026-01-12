@@ -12,10 +12,4 @@ export class UserResponseDto {
 
   @Expose()
   phone: string;
-
-  @Expose()
-  createdAt: Date;
-
-  @Expose()
-  updatedAt: Date;
 }

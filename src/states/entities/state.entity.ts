@@ -15,7 +15,7 @@ import { Country } from '../../countries/entities/country.entity';
 import { Country } from '../../countries/entities/country.entities';
 >>>>>>> ba79b8aa6593304b54d12dd31e378ae03dc1c476
 @Entity('states')
-@Index(['country_id', 'name', 'deleted_at'])
+@Index(['country', 'name', 'deletedAt'])
 export class State {
   @PrimaryGeneratedColumn()
   id: number;

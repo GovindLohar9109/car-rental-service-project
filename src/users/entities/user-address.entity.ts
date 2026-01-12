@@ -5,8 +5,9 @@ import {
   UpdateDateColumn,
   DeleteDateColumn,
   JoinColumn,
-  ManyToMany,
   Index,
+  ManyToOne,
+  Column,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Address } from './address.entity';
@@ -17,14 +18,14 @@ export class UserAddress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToMany(() => User, {
+  @ManyToOne(() => User, (user) => user.userAddresses, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToMany(() => Address, {
+  @ManyToOne(() => Address, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
@@ -38,6 +39,9 @@ export class UserAddress {
     default: () => 'CURRENT_TIMESTAMPZ',
   })
   createdAt: Date;
+
+  @Column({ length: 15, name: 'tag' })
+  tag: string;
 
   @UpdateDateColumn({
     type: 'timestamptz',
