@@ -4,7 +4,7 @@ import { User } from '../users/entities/user.entity';
 import { DataSource } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
 import dotenv from 'dotenv';
-import { UserRoleEnum } from '../common/enums/user-role.enum';
+import { UserRoleEnum } from '../common/enums/role.enum';
 dotenv.config();
 export default async function adminSeeder(dataSource: DataSource) {
   const userRepo = dataSource.getRepository(User);

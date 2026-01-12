@@ -1,19 +1,18 @@
-import {
-  MiddlewareConsumer,
-  Module,
-  NestModule,
-  RequestMethod,
-} from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import dotenv from 'dotenv';
 import { HealthModule } from './health/health.module';
 import { UserModule } from './users/user.module';
 
 import { JwtModule } from '@nestjs/jwt';
-import { AuthMiddleware } from './shared/middlewares/auth.middleware';
+
 import { AuthModule } from './auth/auth.module';
 import { CarModule } from './cars/car.module';
 import { BookingModule } from './bookings/booking.module';
+import { FeedbackModule } from './feedbacks/feedback.module';
+import { AuthGuard } from './common/guards/auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './common/guards/role.guard';
 dotenv.config();
 
 @Module({
@@ -31,26 +30,38 @@ dotenv.config();
     }),
     JwtModule.register({
       global: true,
-      secret: 'secretKey',
+      secret: 'jwtConstants.secret',
     }),
     HealthModule,
     UserModule,
     AuthModule,
     CarModule,
     BookingModule,
+    FeedbackModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .exclude(
-        { path: 'auth/login', method: RequestMethod.POST },
-        { path: 'auth/register', method: RequestMethod.POST },
-        { path: 'auth/refresh', method: RequestMethod.POST },
-      )
-      .forRoutes('/*');
-  }
-}
+export class AppModule {}
+
+// implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(AuthMiddleware)
+//       .exclude(
+//         { path: 'auth/login', method: RequestMethod.POST },
+//         { path: 'auth/register', method: RequestMethod.POST },
+//         { path: 'auth/refresh', method: RequestMethod.POST },
+//       )
+//       .forRoutes('/*');
+//   }
+// }

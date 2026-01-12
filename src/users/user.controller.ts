@@ -8,7 +8,6 @@ import {
   Query,
   Req,
   HttpException,
-  HttpStatus,
   Param,
   Post,
 } from '@nestjs/common';
@@ -18,13 +17,15 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserAddressDto } from './dto/user-address.dto';
 import { UpdateUserAddressDto } from './dto/update-user-address.dto';
 import { CreateCarDto } from '../cars/dto/create-car.dto';
-
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
-import { CarFilterDto } from 'src/cars/dto/car-filter.dto';
+import { Roles } from '../common/decorators/role.decorator';
+import { UserRoleEnum } from '../common/enums/role.enum';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {} // here is DI
+
+  //----------------------------- USER  CONTROLLER METHODS ----------------------------
 
   @Get('me')
   @HttpCode(200)
@@ -33,10 +34,11 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.getUser(+userId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
+  @Roles(UserRoleEnum.ADMIN)
   @Get()
   @HttpCode(200)
   async getAllUsers(@Query() query: PaginationDto) {
@@ -44,7 +46,7 @@ export class UserController {
       const result = await this.userService.getAllUsers(query);
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -55,7 +57,7 @@ export class UserController {
       const userId = req.user.userId;
       return this.userService.updateUser(userId, updateUserDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -66,11 +68,12 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.removeUser(+userId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
-  //----------------------------- USER ADDRESS----------------------------
+  //----------------------------- USER ADDRESS CONTROLLER METHODS ----------------------------
+
   @Post('addresses')
   @HttpCode(201)
   async addUserAddress(
@@ -84,9 +87,10 @@ export class UserController {
         createUserAddressDto,
       );
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
+
   @Get('addresses/:addressId')
   @HttpCode(200)
   async getUserAddress(@Req() req: any, @Param('addressId') addressId: string) {
@@ -94,7 +98,7 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.getUserAddress(+userId, +addressId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -106,7 +110,7 @@ export class UserController {
       const result = await this.userService.getUserAllAddresses(+userId, query);
       return result;
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -122,7 +126,7 @@ export class UserController {
         UpdateUserAddressDto,
       );
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -136,10 +140,13 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.removeUserAddress(+userId, +addressId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
-  //-----------------------------------CAR API -----------------------------------S
+
+  //----------------------------- CAR CONTROLLER METHODS ----------------------------
+
+  @Roles(UserRoleEnum.CAR_OWNER)
   @Post('cars')
   @HttpCode(201)
   async addCar(@Req() req: any, @Body() createCarDto: CreateCarDto) {
@@ -147,7 +154,7 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.addCar(+userId, createCarDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
@@ -157,9 +164,11 @@ export class UserController {
     try {
       return await this.userService.getCarDetails(+carId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
+
+  @Roles(UserRoleEnum.ADMIN, UserRoleEnum.CAR_OWNER)
   @Get('cars')
   @HttpCode(200)
   async getUserAllCars(@Req() req: any, @Query() query: PaginationDto) {
@@ -167,9 +176,11 @@ export class UserController {
       const userId = req.user.userId;
       return await this.userService.getUserAllCars(userId, query);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
+
+  @Roles(UserRoleEnum.CAR_OWNER)
   @Patch('cars/:carId')
   @HttpCode(200)
   async updateCar(
@@ -179,17 +190,18 @@ export class UserController {
     try {
       return this.userService.updateCar(+carId, updateCarDto);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 
+  @Roles(UserRoleEnum.CAR_OWNER, UserRoleEnum.ADMIN)
   @Delete('cars/:carId')
   @HttpCode(200)
   async removeCar(@Param('carId') carId: string) {
     try {
       return await this.userService.removeCar(+carId);
     } catch (err) {
-      throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(err.message, err.status);
     }
   }
 }

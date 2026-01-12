@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 import { Role } from '../roles/entities/role.entity';
-import { UserRoleEnum } from '../common/enums/user-role.enum';
+import { UserRoleEnum } from '../common/enums/role.enum';
 
 export default async function roleSeeder(dataSource: DataSource) {
   const roleRepo = dataSource.getRepository(Role);

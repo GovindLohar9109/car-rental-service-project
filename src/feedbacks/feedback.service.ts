@@ -1,26 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFeedbackDto } from './dto/create-feedback.dto';
-import { UpdateFeedbackDto } from './dto/update-feedback.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PaginationDto } from '../common/dto/pagination.dto';
+import { Repository } from 'typeorm';
+import { Feedback } from './entities/feedback.entity';
 
 @Injectable()
-export class FeedbacksService {
-  create(createFeedbackDto: CreateFeedbackDto) {
-    return 'This action adds a new feedback';
-  }
+export class FeedbackService {
+  constructor(
+    @InjectRepository(Feedback)
+    private readonly feedbackRepository: Repository<Feedback>,
+  ) {}
+  async getAllFeedbacks(paginationDto: PaginationDto) {
+    let { page, limit } = paginationDto;
 
-  findAll() {
-    return `This action returns all feedbacks`;
-  }
+    try {
+      page = page ? page : 1;
+      limit = limit ? limit : 10;
+      const skipRows = (page - 1) * limit;
 
-  findOne(id: number) {
-    return `This action returns a #${id} feedback`;
-  }
+      const [feedbacks, totalRecords] = await this.feedbackRepository
+        .createQueryBuilder('feedback')
+        .innerJoinAndSelect('feedback.booking', 'booking')
+        .innerJoinAndSelect('feedback.user', 'user')
+        .limit(limit)
+        .skip(skipRows)
+        .getManyAndCount();
 
-  update(id: number, updateFeedbackDto: UpdateFeedbackDto) {
-    return `This action updates a #${id} feedback`;
-  }
+      const totalPages = Math.ceil(totalRecords / limit);
+      const result = {
+        status: true,
+        data: feedbacks,
+        totalBookings: totalRecords,
+        pagination: { page, limit, totalPages },
+      };
 
-  remove(id: number) {
-    return `This action removes a #${id} feedback`;
+      return result;
+    } catch (error) {
+      throw new HttpException(
+        error?.message || 'Internal Server Error',
+        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

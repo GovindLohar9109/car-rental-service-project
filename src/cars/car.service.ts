@@ -4,7 +4,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { HttpStatus } from '@nestjs/common';
 import { Car } from './entities/car.entity';
 import { PaginationDto } from '../common/dto/pagination.dto';
-
 import { CarStatus } from './enums/car-status.enum';
 import { UserAddress } from '../users/entities/user-address.entity';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
