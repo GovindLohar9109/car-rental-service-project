@@ -32,7 +32,7 @@ export class AuthService {
     try {
       // checking for email
       let userData = await this.userRepogistry.findOne({
-        where: { email: email },
+        where: { email: email, deletedAt: null },
       });
 
       //cheking for role
@@ -53,7 +53,7 @@ export class AuthService {
           }),
         );
 
-        return { status: true, message: 'User Registered ....' };
+        return { status: true, message: 'User Registered ' };
       } else {
         throw new HttpException('User already exist', HttpStatus.CONFLICT); //409
       }

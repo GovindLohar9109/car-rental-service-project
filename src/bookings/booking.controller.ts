@@ -15,13 +15,17 @@ import {
 import { PaginationDto } from '../common/dto/pagination.dto';
 import { BookingService } from './booking.service';
 import { UpdateBookingDto } from './dto/update-booking.dto';
-import { CreateFeedbackDto } from 'src/feedbacks/dto/create-feedback.dto';
-import { Roles } from 'src/common/decorators/role.decorator';
-import { UserRoleEnum } from 'src/common/enums/role.enum';
+import { CreateFeedbackDto } from '../feedbacks/dto/create-feedback.dto';
+import { Roles } from '../common/decorators/role.decorator';
+import { UserRoleEnum } from '../common/enums/role.enum';
+import { MailService } from '../mail/mail.service';
 
 @Controller('bookings')
 export class BookingController {
-  constructor(private readonly bookingService: BookingService) {} // here is DI
+  constructor(
+    private readonly bookingService: BookingService,
+    private readonly mailService: MailService,
+  ) {} // here is DI
 
   @Roles(UserRoleEnum.ADMIN)
   @Get()
@@ -73,11 +77,27 @@ export class BookingController {
   @Patch(':bookingId')
   @HttpCode(200)
   async updateBooking(
+    @Req() req: any,
     @Param('bookingId') bookingId: string,
     @Body() updateBookingDto: UpdateBookingDto,
   ) {
     try {
-      return this.bookingService.updateBooking(+bookingId, updateBookingDto);
+      const userId = req.user.userId;
+      const { status, message, ownerEmail } =
+        await this.bookingService.updateBooking(
+          +userId,
+          +bookingId,
+          updateBookingDto,
+        );
+
+      await this.mailService.sendMail(
+        ownerEmail,
+        'Welcome to Car Rental Owner',
+        `Your car status ${updateBookingDto.status}`,
+        ``,
+      );
+
+      return { status, message };
     } catch (err) {
       throw new HttpException(err.message, err.status);
     }
