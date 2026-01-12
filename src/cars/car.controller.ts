@@ -14,7 +14,7 @@ import { PaginationDto } from '../common/dto/pagination.dto';
 import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 import { MailService } from '../mail/mail.service';
 import { Roles } from '../common/decorators/role.decorator';
-import { UserRoleEnum } from 'src/common/enums/role.enum';
+import { UserRoleEnum } from '../common/enums/role.enum';
 
 @Controller('cars')
 export class CarController {
@@ -45,6 +45,7 @@ export class CarController {
   ) {
     try {
       const userId = req.user.userId;
+
       const { status, message, userEmail, ownerEmail } =
         await this.carService.addBooking(+userId, +carId, createBookingDto);
 
@@ -55,23 +56,23 @@ export class CarController {
         ownerEmail,
         'Car Booking Confirmation',
         `
-Hello,
+      Hello,
 
-Thank you for choosing our Car Rental Service!
+      Thank you for choosing our Car Rental Service!
 
-We are pleased to confirm your booking with the following details:
+      We are pleased to confirm your booking with the following details:
 
-1. Car ID: ${carId}
-2. Booking Period: ${startDate} to ${endDate}
+      1. Car ID: ${carId}
+      2. Booking Period: ${startDate} to ${endDate}
 
-Please ensure you carry a valid driving license and ID at the time of pickup.
-If you have any questions or need assistance, feel free to contact our support team.
+      Please ensure you carry a valid driving license and ID at the time of pickup.
+      If you have any questions or need assistance, feel free to contact our support team.
 
-We wish you a safe and pleasant journey!
+      We wish you a safe and pleasant journey!
 
-Best regards,
-Car Rental Service Team
-  `,
+      Best regards,
+      Car Rental Service Team
+        `,
         '',
       );
 
@@ -80,21 +81,21 @@ Car Rental Service Team
         ownerEmail,
         'Your Car Has Been Booked',
         `
-Hello,
+      Hello,
 
-We would like to inform you that your car has been successfully booked.
+      We would like to inform you that your car has been successfully booked.
 
-1. Car ID: ${carId}
-2. Booked By: ${userEmail}
-3. Booking Period: ${startDate} to ${endDate}
+      1. Car ID: ${carId}
+      2. Booked By: ${userEmail}
+      3. Booking Period: ${startDate} to ${endDate}
 
-Please make sure the car is available and in good condition for the scheduled booking period.
+      Please make sure the car is available and in good condition for the scheduled booking period.
 
-Thank you for being a valued partner with us.
+      Thank you for being a valued partner with us.
 
-Warm regards,
-Car Rental Service Team
-  `,
+      Warm regards,
+      Car Rental Service Team
+        `,
         '',
       );
 

@@ -32,7 +32,7 @@ export class CarService {
     try {
       page = page ? page : 1;
       limit = limit ? limit : 10;
-      const skipRows = (page - 1) * limit;
+      const skipRows = Math.max(0, (page - 1) * limit);
 
       const qb = this.userAddressRepository
         .createQueryBuilder('ua')
@@ -49,6 +49,7 @@ export class CarService {
       }
 
       let users = await qb.getRawMany();
+
       users = users.flatMap((user) => user.userId);
 
       // validation on startDate and endDate
@@ -156,7 +157,9 @@ export class CarService {
         where: { id: carId },
         relations: { user: true },
       });
+
       const user = await this.userRepository.findOneBy({ id: userId });
+
       const ownerEmail = car.user.email;
       const userEmail = user.email;
 
