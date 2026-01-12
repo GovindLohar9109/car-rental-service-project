@@ -6,11 +6,13 @@ import {
   DeleteDateColumn,
   JoinColumn,
   ManyToMany,
+  Index,
 } from 'typeorm';
 import { User } from './user.entity';
 import { Address } from './address.entity';
 
 @Entity('user_address')
+@Index(['user', 'address', 'deletedAt'])
 export class UserAddress {
   @PrimaryGeneratedColumn()
   id: number;

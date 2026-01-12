@@ -1,12 +1,14 @@
 import {
   Entity,
   Column,
-  Index,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  OneToMany,
+  Index,
 } from 'typeorm';
+import { UserRole } from './user-role.entity';
 
 @Entity('users')
 @Index(['name', 'deletedAt'])
@@ -49,4 +51,6 @@ export class User {
     default: null,
   })
   deletedAt: Date;
+  @OneToMany(() => UserRole, (userRole) => userRole.user)
+  userRoles: UserRole[];
 }

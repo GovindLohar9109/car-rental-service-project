@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   DeleteDateColumn,
+  Index,
 } from 'typeorm';
 @Entity('countries')
+@Index(['name', 'deletedAt'])
 export class Country {
   @PrimaryGeneratedColumn()
   id: number;

@@ -7,10 +7,12 @@ import {
   DeleteDateColumn,
   ManyToOne,
   JoinColumn,
+  Index,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { CarStatus } from '../enums/car-status.enum';
 @Entity('cars')
+@Index(['user', 'deletedAt'])
 export class Car {
   @PrimaryGeneratedColumn()
   id: number;
