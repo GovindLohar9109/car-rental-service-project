@@ -16,7 +16,6 @@ import { AuthService } from './auth.service';
 import { JwtHelper } from './helpers/jwt.helper';
 import { RegisterAuthDto } from './dto/register.dto';
 import { LoginAuthDto } from './dto/login.dto';
-import { RegisterResponseDto } from './dto/registerResponse.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
 import { RefreshResponseDto } from './dto/refreshResponse.dto';
 import { Public } from '../common/decorators/public.decorator';
@@ -41,7 +40,7 @@ export class AuthController {
         'Your account has been created',
         `<h1>Welcome!</h1><p>Thanks for registering.</p>`,
       );
-      result.message += 'and mail sent';
+      result.message += 'and check your mail';
       return result;
     } catch (error) {
       throw new HttpException(error?.message, error?.status);

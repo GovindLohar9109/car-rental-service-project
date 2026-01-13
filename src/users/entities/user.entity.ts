@@ -11,6 +11,7 @@ import {
 import { UserRole } from './user-role.entity';
 import { UserAddress } from './user-address.entity';
 import { Exclude, Expose } from 'class-transformer';
+import { Car } from 'src/cars/entities/car.entity';
 @Expose()
 @Entity('users')
 @Index('users_email_deleted_at_cuidx', ['email', 'deletedAt'], { unique: true })

@@ -27,11 +27,9 @@ export class CarService {
   ) {}
 
   async getAllCar(paginationDto: PaginationDto) {
-    let { page, limit } = paginationDto;
+    const { page = 1, limit = 10 } = paginationDto;
 
     try {
-      page = page ? page : 1;
-      limit = limit ? limit : 10;
       const skipRows = (page - 1) * limit;
 
       const qb = this.userAddressRepository
@@ -49,6 +47,7 @@ export class CarService {
       }
 
       let users = await qb.getRawMany();
+
       users = users.flatMap((user) => user.userId);
 
       // validation on startDate and endDate
@@ -107,10 +106,13 @@ export class CarService {
         (booking) => booking.b_car_id,
       );
 
-      const whereCondition = {
-        status: paginationDto.status ?? CarStatus.AVAILABLE,
+      const whereCondition: any = {
+        status: paginationDto.status ?? undefined,
         user: { id: In(users) },
         id: Not(In(notAvailableCarIds)),
+        type: paginationDto.type ?? undefined,
+        model: paginationDto.model ?? undefined,
+        color: paginationDto.color ?? undefined,
       };
 
       const [cars, totalRecords] = await this.carRepository.findAndCount({
@@ -152,15 +154,14 @@ export class CarService {
         status: createBookingDto.status,
       };
 
-      // const car = await this.carRepository.find({
-      //   where: { id: carId },
-      // });
-
-      // const ownerEmail = car.ownerEmail;
+      const car = await this.carRepository.findOne({
+        where: { id: carId },
+        relations: { user: true },
+      });
 
       const user = await this.userRepository.findOneBy({ id: userId });
 
-      // const ownerEmail = car.user.email;
+      const ownerEmail = car.user.email;
       const userEmail = user.email;
 
       const newBooking = this.bookingRepository.create(bookingData);
@@ -176,7 +177,7 @@ export class CarService {
       return {
         status: true,
         message: 'Car is booked ...',
-
+        ownerEmail,
         userEmail,
       };
     } catch (error) {

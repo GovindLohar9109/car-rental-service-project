@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import dotenv from 'dotenv';
+import * as dotenv from 'dotenv';
+dotenv.config();
 import { HealthModule } from './health/health.module';
 import { UserModule } from './users/user.module';
 
@@ -14,10 +15,16 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/role.guard';
 import { MailModule } from './mail/main.module';
-dotenv.config();
+
+import { UploadController } from './upload/upload.controller';
+import { MulterModule } from '@nestjs/platform-express';
+import { CloudinaryService } from './upload/cloudinary.service';
 
 @Module({
   imports: [
+    MulterModule.register({
+      dest: './src/uploads',
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,
@@ -41,7 +48,7 @@ dotenv.config();
     FeedbackModule,
     MailModule,
   ],
-  controllers: [],
+  controllers: [UploadController],
   providers: [
     {
       provide: APP_GUARD,
@@ -51,6 +58,7 @@ dotenv.config();
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    CloudinaryService,
   ],
 })
 export class AppModule {}

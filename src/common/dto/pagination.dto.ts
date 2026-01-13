@@ -2,11 +2,12 @@ import { Type } from 'class-transformer';
 import {
   IsDateString,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Min,
 } from 'class-validator';
-import { CarStatus } from 'src/cars/enums/car-status.enum';
+import { CarStatus } from '../../cars/enums/car-status.enum';
 
 export class PaginationDto {
   @IsOptional()
@@ -26,6 +27,18 @@ export class PaginationDto {
   status: CarStatus;
 
   @IsOptional()
+  @IsString()
+  model: string;
+
+  @IsOptional()
+  @IsString()
+  type: string;
+
+  @IsOptional()
+  @IsString()
+  color: string;
+
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   locationId: number;
@@ -37,4 +50,14 @@ export class PaginationDto {
   @IsOptional()
   @IsDateString()
   endDate: Date;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  month: number;
+
+  @Type(() => Number)
+  @IsOptional()
+  @IsNumber()
+  year: number;
 }

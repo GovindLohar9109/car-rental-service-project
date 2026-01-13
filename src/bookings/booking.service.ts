@@ -28,35 +28,97 @@ export class BookingService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async getAllBookings(paginationDto: PaginationDto) {
-    let { page, limit } = paginationDto;
+  async getAllBookings(queryDto: PaginationDto) {
+    let { page = 1, limit = 10, month, year, status } = queryDto;
 
     try {
-      page = page ? page : 1;
-      limit = limit ? limit : 10;
+      // CASE 1:- All Month bookings of given year
+
+      if (year && !month) {
+        const rawData = await this.bookingRepository
+          .createQueryBuilder('booking')
+          .select('EXTRACT(MONTH FROM booking.createdAt)', 'month')
+          .addSelect('COUNT(booking.id)', 'totalBookings')
+          .addSelect('SUM(booking.totalAmount)', 'totalRevenue')
+          .where('EXTRACT(YEAR FROM booking.createdAt) = :year', { year })
+          .andWhere('booking.status =:status', { status })
+          .groupBy('month')
+          .orderBy('month', 'ASC')
+          .getRawMany();
+
+        const monthNames = [
+          'January',
+          'February',
+          'March',
+          'April',
+          'May',
+          'June',
+          'July',
+          'August',
+          'September',
+          'October',
+          'November',
+          'December',
+        ];
+
+        const data = monthNames.map((name, index) => {
+          const found = rawData.find((r) => Number(r.month) === index + 1);
+          return {
+            month: name,
+            totalBookings: found ? Number(found.totalBookings) : 0,
+            totalRevenue: found ? Number(found.totalRevenue) : 0,
+          };
+        });
+
+        return {
+          status: true,
+          type: 'MONTHLY_SUMMARY',
+          year,
+          data,
+        };
+      }
+
+      // CASE 2:- All Bookings or Month Filter
+
       const skipRows = (page - 1) * limit;
 
-      const [bookings, totalRecords] = await this.bookingRepository
+      const query = this.bookingRepository
         .createQueryBuilder('booking')
         .innerJoinAndSelect('booking.car', 'car')
         .innerJoinAndSelect('booking.user', 'user')
-        .limit(limit)
+        .orderBy('booking.createdAt', 'DESC');
+
+      if (status) {
+        query.andWhere('booking.status =:status', { status });
+      }
+      if (month && year) {
+        query.andWhere(
+          `EXTRACT(MONTH FROM booking.createdAt) = :month
+         AND EXTRACT(YEAR FROM booking.createdAt) = :year`,
+          { month, year },
+        );
+      }
+
+      const [bookings, totalRecords] = await query
         .skip(skipRows)
+        .take(limit)
         .getManyAndCount();
 
-      const totalPages = Math.ceil(totalRecords / limit);
-      const result = {
+      return {
         status: true,
-        data: bookings,
+        type: month && year ? 'MONTHLY_DETAILED' : 'ALL_BOOKINGS',
         totalBookings: totalRecords,
-        pagination: { page, limit, totalPages },
+        pagination: {
+          page,
+          limit,
+          totalPages: Math.ceil(totalRecords / limit),
+        },
+        data: bookings,
       };
-
-      return result;
     } catch (error) {
       throw new HttpException(
-        error?.message || 'Internal Server Error',
-        error?.status || HttpStatus.INTERNAL_SERVER_ERROR,
+        error.message || 'Internal Server Error',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
   }
@@ -122,7 +184,7 @@ export class BookingService {
     updateBookingDto: UpdateBookingDto,
   ) {
     try {
-      //updaing booking status
+      //updating booking status
       await this.bookingRepository.update(
         { id: bookingId },
         { ...updateBookingDto },
@@ -137,14 +199,13 @@ export class BookingService {
         booking: { id: bookingId },
         user: { id: existBooking.user.id },
         car: { id: existBooking.car.id },
-        totalAmount: existBooking.totalAmount,
+        totalAmount: Number(existBooking.totalAmount),
         startDate: existBooking.startDate,
         endDate: existBooking.endDate,
         status: existBooking.status,
       };
 
-      const user = await this.userRepository.findOneBy({ id: userId });
-      // //updating booking history status
+      //updating booking history status
       await this.bookingHistoryRepository.save(
         this.bookingHistoryRepository.create(newHistory),
       );
@@ -159,10 +220,11 @@ export class BookingService {
         { status: carStatus },
       );
 
+      const userEmail = existBooking.user.email;
       return {
         status: true,
         message: 'Booking  updated...',
-        ownerEmail: user.email,
+        userEmail,
       };
     } catch (error) {
       throw new HttpException(

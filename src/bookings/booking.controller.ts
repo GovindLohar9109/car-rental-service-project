@@ -83,7 +83,7 @@ export class BookingController {
   ) {
     try {
       const userId = req.user.userId;
-      const { status, message, ownerEmail } =
+      const { status, message, userEmail } =
         await this.bookingService.updateBooking(
           +userId,
           +bookingId,
@@ -91,10 +91,23 @@ export class BookingController {
         );
 
       await this.mailService.sendMail(
-        ownerEmail,
-        'Welcome to Car Rental Owner',
-        `Your car status ${updateBookingDto.status}`,
-        ``,
+        userEmail,
+        'Booking Status Update – User Notification',
+        `Hello,
+
+This is to inform you that the status of your booking has been updated in our system.
+
+1. Booking ID: ${bookingId}
+2. Updated Status: ${updateBookingDto.status}
+
+Please review the update and ensure everything is in order. If you have any questions or need assistance, feel free to contact our support team.
+
+Thank you for choosing Car Rental Service.
+
+Kind regards,
+Car Rental Service Team
+`,
+        '',
       );
 
       return { status, message };
