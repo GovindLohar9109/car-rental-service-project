@@ -15,7 +15,7 @@ import { UserAddress } from './entities/user-address.entity';
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
 import { Car } from '../cars/entities/car.entity';
 import { CreateCarDto } from '../cars/dto/create-car.dto';
-import { CarStatus } from 'src/cars/enums/car-status.enum';
+import { CarStatus } from '../cars/enums/car-status.enum';
 import { User } from './entities/user.entity';
 
 @Injectable()

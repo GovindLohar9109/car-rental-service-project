@@ -53,7 +53,7 @@ export class AuthService {
           }),
         );
 
-        return { status: true, message: 'User Registered ' };
+        return { status: true, message: 'User Registered' };
       } else {
         throw new HttpException('User already exist', HttpStatus.CONFLICT); //409
       }

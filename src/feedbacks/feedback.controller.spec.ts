@@ -1,20 +1,47 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FeedbacksController } from './feedbacks.controller';
-import { FeedbacksService } from './feedback.service';
+import { FeedbackController } from './feedback.controller';
+import { FeedbackService } from './feedback.service';
+import { PaginationDto } from '../common/dto/pagination.dto';
 
-describe('FeedbacksController', () => {
-  let controller: FeedbacksController;
+describe('FeedbackController', () => {
+  let controller: FeedbackController;
+  let feedbackService: jest.Mocked<FeedbackService>;
+
+  const mockFeedbackService = {
+    getAllFeedbacks: jest.fn(),
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [FeedbacksController],
-      providers: [FeedbacksService],
+      controllers: [FeedbackController],
+      providers: [
+        {
+          provide: FeedbackService,
+          useValue: mockFeedbackService,
+        },
+      ],
     }).compile();
 
-    controller = module.get<FeedbacksController>(FeedbacksController);
+    controller = module.get<FeedbackController>(FeedbackController);
+    feedbackService = module.get(FeedbackService);
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  // GET ALL FEEDBACKS
+
+  describe('getAllFeedbacks', () => {
+    const query: PaginationDto = { page: 1, limit: 10 };
+
+    it('should return all feedbacks', async () => {
+      const output = {
+        status: true,
+        data: [],
+        totalBookings: 2,
+        pagination: { page: 1, limit: 10, totalPages: 2 },
+      };
+
+      feedbackService.getAllFeedbacks.mockResolvedValue(output);
+      const result = await controller.getAllFeedbacks(query);
+      expect(result).toEqual(output);
+    });
   });
 });
