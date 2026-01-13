@@ -15,7 +15,7 @@ import { AuthGuard } from './common/guards/auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './common/guards/role.guard';
 import { MailModule } from './mail/main.module';
-
+import { CacheModule } from '@nestjs/cache-manager';
 import { UploadController } from './upload/upload.controller';
 import { MulterModule } from '@nestjs/platform-express';
 import { CloudinaryService } from './upload/cloudinary.service';
@@ -25,6 +25,7 @@ import { CloudinaryService } from './upload/cloudinary.service';
     MulterModule.register({
       dest: './src/uploads',
     }),
+    CacheModule.register({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: process.env.DB_HOST,

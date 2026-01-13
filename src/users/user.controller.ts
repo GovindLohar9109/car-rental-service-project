@@ -10,6 +10,7 @@ import {
   HttpException,
   Param,
   Post,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
@@ -20,6 +21,7 @@ import { CreateCarDto } from '../cars/dto/create-car.dto';
 import { UpdateCarDto } from '../cars/dto/update-car.dto';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRoleEnum } from '../common/enums/role.enum';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('users')
 export class UserController {
@@ -28,6 +30,7 @@ export class UserController {
   //----------------------------- USER  CONTROLLER METHODS ----------------------------
 
   @Get('me')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getUser(@Req() req: any) {
     try {
@@ -40,6 +43,7 @@ export class UserController {
 
   @Roles(UserRoleEnum.ADMIN)
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getAllUsers(@Query() query: PaginationDto) {
     try {
@@ -92,6 +96,7 @@ export class UserController {
   }
 
   @Get('addresses/:addressId')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getUserAddress(@Req() req: any, @Param('addressId') addressId: string) {
     try {
@@ -103,6 +108,7 @@ export class UserController {
   }
 
   @Get('addresses')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getUserAllAddresses(@Req() req: any, @Query() query: PaginationDto) {
     try {
@@ -159,6 +165,7 @@ export class UserController {
   }
 
   @Get('cars/:carId')
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getCarDetails(@Param('carId') carId: string) {
     try {
@@ -169,6 +176,7 @@ export class UserController {
   }
 
   @Roles(UserRoleEnum.ADMIN, UserRoleEnum.CAR_OWNER)
+  @UseInterceptors(CacheInterceptor)
   @Get('cars')
   @HttpCode(200)
   async getUserAllCars(@Req() req: any, @Query() query: PaginationDto) {

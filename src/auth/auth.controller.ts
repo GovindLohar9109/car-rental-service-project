@@ -10,16 +10,14 @@ import {
 } from '@nestjs/common';
 
 import type { Request } from 'express';
-
 import { AuthService } from './auth.service';
-
 import { JwtHelper } from './helpers/jwt.helper';
 import { RegisterAuthDto } from './dto/register.dto';
 import { LoginAuthDto } from './dto/login.dto';
 import { LoginResponseDto } from './dto/loginResponse.dto';
 import { RefreshResponseDto } from './dto/refreshResponse.dto';
 import { Public } from '../common/decorators/public.decorator';
-import { MailService } from 'src/mail/mail.service';
+import { MailService } from '../mail/mail.service';
 
 @Public()
 @Controller('auth')
@@ -40,7 +38,9 @@ export class AuthController {
         'Your account has been created',
         `<h1>Welcome!</h1><p>Thanks for registering.</p>`,
       );
+
       result.message += 'and check your mail';
+
       return result;
     } catch (error) {
       throw new HttpException(error?.message, error?.status);
@@ -49,7 +49,6 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   async userLogin(
-    @Res({ passthrough: true }) res: Response,
     @Body() loginAuthDto: LoginAuthDto,
   ): Promise<LoginResponseDto> {
     try {

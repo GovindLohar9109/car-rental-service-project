@@ -8,6 +8,7 @@ import {
   Body,
   Post,
   Req,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CarService } from './car.service';
 import { PaginationDto } from '../common/dto/pagination.dto';
@@ -15,6 +16,7 @@ import { CreateBookingDto } from '../bookings/dto/create-booking.dto';
 import { MailService } from '../mail/mail.service';
 import { Roles } from '../common/decorators/role.decorator';
 import { UserRoleEnum } from '../common/enums/role.enum';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 
 @Controller('cars')
 export class CarController {
@@ -24,6 +26,7 @@ export class CarController {
   ) {} // here is DI
 
   @Get()
+  @UseInterceptors(CacheInterceptor)
   @HttpCode(200)
   async getAllCar(@Query() query: PaginationDto) {
     try {
